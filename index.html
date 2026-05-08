@@ -620,7 +620,7 @@
         </div>
         <!-- Cố định nút quà ở dưới -->
         <div class="z-100" style="position: absolute; bottom: 30px; width: 100%; text-align: center;">
-            <button onclick="goToScreen('screen-gift')">Nhận một món quà cuối nhé 🎁</button>
+            <button onclick="goToScreen('screen-gift')">Bấm nhẹ cái nữa nè chị 🎁</button>
         </div>
     </div>
 
@@ -703,17 +703,20 @@
         checkRotationRequirement();
     };
 
+    window.currentUser = "Khách ẩn danh"; 
+
     window.handleLogin = function() {
         let name = document.getElementById('usernameInput').value.trim();
-        if(!name) { customAlert('Nhập tên xưng danh bạn ơi ^^!', '🌸'); return; }
+        if(!name) { customAlert('Nhập tên bạn ơi ^^', '🌸'); return; }
+        window.currentUser = name; 
         let normalizedName = name.toLowerCase();
         if(normalizedName.includes('linh')) {
-            isMainLinh = true;
-            goToScreen('screen-welcome-linh');
+            window.isMainLinh = true;
+            window.goToScreen('screen-welcome-linh');
         } else {
-            isMainLinh = false;
+            window.isMainLinh = false;
             document.getElementById('guestWelcomeTitle').innerText = `Hế nhô ${name}! 🥳`;
-            goToScreen('screen-welcome-guest');
+            window.goToScreen('screen-welcome-guest');
         }
     };
 
@@ -744,8 +747,12 @@
         let content = document.getElementById('wishInput').value.trim();
         if(!content) { customAlert('Nhập xíu tâm tình cho chủ tiệc vui nha ^^!', '✍️'); return; }
         
-        push(wishesRef, { text: content, timestamp: Date.now() }).then(() => {
-            customAlert("Thiệp đã trao tận tay chị Linh rồi nhó!", '🚀', function() {
+        push(wishesRef, { 
+        sender: window.currentUser, 
+        text: content, 
+        timestamp: Date.now() 
+        }).then(() => {
+            window.customAlert("Thiệp đã trao tận tay chị Linh rồi nhó!", '🚀', function() {
                 goToScreen('screen-gift');
             });
         });
