@@ -306,11 +306,6 @@
             to { transform: rotate(360deg); }
         }
 
-        @media (orientation: portrait) and (max-width: 768px) {
-            #rotate-hint { display: flex; }
-            #gift-content-wrapper { display: none; } /* Ẩn hộp quà khi chưa xoay */
-        }
-
         /* Hiệu ứng Rung màn hình */
         .shake-screen {
             animation: shakeScreen 0.5s infinite;
@@ -821,27 +816,31 @@
 
     // --- KIỂM TRA XOAY MÀN HÌNH ---
     window.checkRotationRequirement = function() {
+        const currentScreen = document.querySelector('.screen.active');
+        if (!currentScreen || currentScreen.id !== 'screen-gift') return;
+
         const hint = document.getElementById('rotate-hint');
         const giftContent = document.getElementById('gift-content-wrapper');
         const rotateName = document.getElementById('rotate-user-name');
-        const isPortrait = window.innerHeight > window.innerWidth;
-        const currentScreen = document.querySelector('.screen.active');
-
-        if (currentScreen && currentScreen.id === 'screen-gift') {
-            // Cập nhật tên người dùng vào lời nhắc cho thân thiện
+        
+        // Đợi 200ms để trình duyệt cập nhật xong kích thước thực tế sau khi xoay
+        setTimeout(() => {
+            const isPortrait = window.innerHeight > window.innerWidth;
             rotateName.innerText = window.currentUser + " ơi!";
 
             if (isPortrait) {
-                // Cứ là màn hình đứng thì hiện nhắc xoay, bất kể là ai
-                hint.style.display = 'flex'; 
-                giftContent.style.display = 'none';
+                hint.style.setProperty('display', 'flex', 'important');
+                giftContent.style.setProperty('display', 'none', 'important');
             } else {
-                // Đã xoay ngang thì hiện hộp quà
-                hint.style.display = 'none'; 
-                giftContent.style.display = 'block';
+                hint.style.setProperty('display', 'none', 'important');
+                giftContent.style.setProperty('display', 'block', 'important');
             }
-        }
+        }, 200);
     };
+
+    // Lắng nghe cả sự kiện resize và orientationchange để chắc chắn 100%
+    window.addEventListener('resize', window.checkRotationRequirement);
+    window.addEventListener('orientationchange', window.checkRotationRequirement);
 
     // --- MỞ QUÀ & HIỆU ỨNG (ÁP DỤNG CHO TẤT CẢ) ---
     window.handleOpenGift = function() {
