@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Linh!</title>
+    <!-- Thêm font chữ siêu cute từ Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #ffb6b9;
+            --secondary: #fae3d9;
+            --accent: #bbded6;
+            --text-color: #555;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--secondary) 0%, #ffecd2 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; /* Tránh cuộn ngang dọc không mong muốn */
+        }
+
+        /* Mô phỏng khung điện thoại nếu mở trên máy tính */
+        #app-container {
+            width: 100%;
+            max-width: 1500px;
+            height: 100vh;
+            max-height: 850px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.5s ease;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            transform: scale(0.95);
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+            z-index: 10;
+        }
+
+        h1, h2 {
+            font-family: 'Pacifico', cursive;
+            font-size: 33px;
+            color: #ff6f69;
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        textarea { height: 120px; resize: none; font-family: 'Dancing Script', cursive; font-size: 1.5rem; color: #e91e63;}
+        input, textarea {
+            width: 30%;
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px solid white;
+            background: rgba(255,255,255,0.7);
+            font-size: 16px;
+            margin-bottom: 20px;
+            outline: none;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+            transition: border 0.3s;
+        }
+        
+        input:focus, textarea:focus { border-color: var(--primary); }
+        textarea { height: 120px; resize: none; }
+
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(45deg, var(--primary), #ff8a8f);
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 182, 185, 0.5);
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* --------- Slide Hành trình (BẢN KHUNG POLAROID ẢNH NGANG) --------- */
+        .film-container {
+            width: calc(100% + 40px);
+            margin-left: -20px; 
+            margin-right: -20px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+
+        .film-track {
+            display: flex;
+            gap: 20px; 
+            width: max-content; 
+            animation: scroll-left 100s linear infinite; /* KÉO THỜI GIAN LÊN 18s DO BĂNG ẢNH ĐÃ DÀI HƠN */
+            padding-left: 20px; 
+        }
+
+        .film-track:hover {
+            animation-play-state: paused; /* Bấm đè ngón tay sẽ ngừng chạy */
+        }
+
+        .film-card {
+            width: 300px; /* Bề ngang nới rộ rộng bự hơn cho khớp form hình gốc ngang! */
+            background: #fff;
+            padding: 10px 10px 15px 10px;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
+            display: flex;
+            flex-direction: column;
+            transform: rotate(-3deg); 
+            transition: transform 0.3s ease;
+        }
+
+        .film-card:nth-child(even) {
+            transform: rotate(3deg) translateY(10px);
+        }
+
+        .film-card img {
+            width: 100%;
+            height: 180px; /* Khống chế chiều lùn form ngang (Landscape) tự động theo lề 300px */
+            object-fit: cover; 
+            border-radius: 8px;
+        }
+
+        .film-card .note {
+            font-family: 'Pacifico', cursive; 
+            color: #d15c7e;
+            text-align: center;
+            font-size: 16px;
+            margin-top: 15px;
+            line-height: 1.2;
+        }
+
+        @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(-50% - 10px)); } 
+        }
+        
+        /* Giao diện Bất ngờ Linh - Đám mây & Bong bóng bay (Step 3) */
+        #screen-surprise-linh {
+            justify-content: flex-start;
+            padding-top: 50px;
+        }
+        .cloud-wish {
+            position: absolute;
+            bottom: -100px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 20px;
+            border-radius: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            animation: floatUp 8s linear infinite;
+            max-width: 80%;
+            text-align: center;
+            font-weight: bold;
+            color: #d15c7e;
+        }
+
+        @keyframes floatUp {
+            to { transform: translateY(-100vh); }
+        }
+
+        /* Hộp quà và Quà tặng (Step 4) */
+        .gift-box {
+            font-size: 100px;
+            cursor: pointer;
+            animation: shake 2s infinite cubic-bezier(.36,.07,.19,.97) both;
+            transform-origin: bottom;
+        }
+
+        .gift-image-wrapper {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        
+        .gift-image-wrapper img {
+            width: 250px;
+            border-radius: 20px;
+            border: 5px solid white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            10%, 30%, 50%, 70%, 90% { transform: rotate(-5deg); }
+            20%, 40%, 60%, 80% { transform: rotate(5deg); }
+        }
+
+        @keyframes popUp {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .z-100 { z-index: 100; position: relative;}
+        @media (orientation: landscape) and (max-height: 500px) {
+            input, textarea {
+                width: 50%;
+            }
+        }
+
+        @media (orientation: portrait) and (max-height: 850px) {
+            input, textarea {
+                width: 80%;
+            }
+        }
+
+        /* --- FIX GIAO DIỆN KHI XOAY NGANG ĐIỆN THOẠI --- */
+        @media (orientation: landscape) and (max-height: 500px) {
+            /* Thu nhỏ khung ảnh phim để không chiếm hết chiều cao */
+            .film-card {
+                width: 220px; 
+                padding: 8px;
+            }
+
+            .film-card img {
+                height: 120px; /* Giảm chiều cao ảnh */
+            }
+
+            .film-card .note {
+                font-size: 13px;
+                margin-top: 8px;
+            }
+
+            .film-container {
+                margin-bottom: 15px;
+            }
+
+            /* Màn hình quà tặng cũng cần thu nhỏ ảnh */
+            .gift-image-wrapper img {
+                width: 150px;
+            }
+        }
+        /* Style cho Custom Alert */
+        #custom-alert-overlay {
+            display: none; /* Mặc định ẩn */
+        }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            #custom-alert-box {
+                padding: 15px;
+                max-width: 300px;
+            }
+            #alert-icon { font-size: 25px; margin-bottom: 5px; }
+            #alert-message { margin-bottom: 15px; font-size: 14px; }
+        }
+        /* Lời nhắc xoay điện thoại (Chỉ hiện ở Portrait Mobile) */
+        #rotate-hint {
+            display: none; /* JS sẽ điều khiển cái này */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 182, 185, 0.98);
+            z-index: 200;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Thêm hiệu ứng xoay cho icon */
+        @keyframes rotating {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @media (orientation: portrait) and (max-width: 768px) {
+            #rotate-hint { display: flex; }
+            #gift-content-wrapper { display: none; } /* Ẩn hộp quà khi chưa xoay */
+        }
+
+        /* Hiệu ứng Rung màn hình */
+        .shake-screen {
+            animation: shakeScreen 0.5s infinite;
+        }
+
+        @keyframes shakeScreen {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            100% { transform: translate(1px, 1px) rotate(0deg); }
+        }
+
+        /* Hiệu ứng Nổ Boom (Flash trắng) */
+        #boom-effect {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: white;
+            opacity: 0;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .boom-active {
+            animation: boomFlash 0.6s ease-out;
+        }
+
+        @keyframes boomFlash {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* Hình ảnh quà tặng phát sáng */
+        .glow-image {
+            box-shadow: 0 0 20px #fff, 0 0 40px #ffb6b9, 0 0 60px #ffb6b9;
+            animation: imageGlow 2s infinite alternate;
+            width: 80% !important; /* Ưu tiên hiển thị ngang */
+            max-width: 600px !important;
+        }
+
+        @keyframes imageGlow {
+            from { filter: drop-shadow(0 0 5px #fff); }
+            to { filter: drop-shadow(0 0 20px #ffb6b9); }
+        }
+        /* Hiệu ứng Nổ thực tế */
+        #boom-blast {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 10px; height: 10px;
+            background: radial-gradient(circle, #fff 0%, #ff6f69 40%, #ff8a8f 70%, transparent 100%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        .blast-active {
+            animation: blastAnim 0.8s ease-out forwards;
+        }
+
+        @keyframes blastAnim {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            50% { opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(150); opacity: 0; }
+        }
+
+        /* Hiệu ứng Pháo hoa (Fireworks) */
+        .firework {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            z-index: 2000;
+            pointer-events: none;
+        }
+
+        @keyframes fireworkExplode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            50% { opacity: 1; filter: brightness(1.5); } /* Hiệu ứng lấp lánh giữa chừng */
+            100% { 
+                transform: translate(var(--x), var(--y)) scale(0); 
+                opacity: 0; 
+                filter: blur(1px); /* Làm mờ đuôi pháo */
+            }
+        }
+
+        /* Hiệu ứng Fade-in cho Gift Result (Hình ảnh quà tặng) */
+        #giftResult {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: #000;
+            display: none; /* Sẽ đổi thành flex bởi JS */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            overflow: hidden;
+            /* Hiệu ứng mượt mà */
+            opacity: 0;
+            transition: opacity 2s ease-in-out; 
+        }
+
+        /* Class kích hoạt hiện hình ảnh */
+        #giftResult.active-show {
+            opacity: 1;
+        }
+
+        #finalImage {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            /* Thêm một chút zoom nhẹ khi hiện ra */
+            transform: scale(1.1);
+            transition: transform 3s ease-out;
+        }
+
+        #giftResult.active-show #finalImage {
+            transform: scale(1);
+        }
+        /* Nút quay lại nằm ở góc trên bên phải */
+        .btn-back-corner {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 1100;
+            padding: 10px 15px !important;
+            font-size: 12px !important;
+            background: rgba(255, 255, 255, 0.3) !important;
+            backdrop-filter: blur(5px);
+            border: 1px solid white !important;
+            opacity: 0; /* Mặc định ẩn, hiện sau khi nổ */
+            transition: opacity 1s;
+            margin-top: 0 !important;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    
+    <!-- MÀN HÌNH 1: ĐĂNG NHẬP -->
+    <div id="screen-login" class="screen active">
+        <h1>Welcome to my world🎂</h1>
+        <p style="margin-bottom: 20px; text-align:center;">Vui lòng nhập tên của bạn nhé!</p>
+        <input type="text" id="usernameInput" placeholder="Ví dụ: Hồng Linh, Tuấn...">
+        <button onclick="handleLogin()">Khám phá ngay</button>
+    </div>
+
+<!-- MÀN HÌNH CHÀO MỪNG CHO LINH -->
+    <div id="screen-welcome-linh" class="screen">
+        <h1 style="font-size: 35px;">Hế nhô Nàng Thơ<br>Hồng Linh 👑✨</h1>
+        <p style="text-align:center; margin-bottom: 30px; line-height: 1.6;">
+            Chào mừng chị đã đến với "vương quốc" sinh nhật của riêng mình!<br>
+            Mọi thứ ở đây đều dành cho chị.<br>
+            Sẵn sàng để nhìn lại hành trình rực rỡ chưa ạ?
+        </p>
+        <button onclick="goToScreen('screen-journey')">Let's goooo 🚀</button>
+    </div>
+
+    <!-- MÀN HÌNH CHÀO MỪNG CHO KHÁCH (GUEST) -->
+    <div id="screen-welcome-guest" class="screen">
+        <h1 id="guestWelcomeTitle">Chào bạn nha! 🥳</h1>
+        <p style="text-align:center; margin-bottom: 30px; line-height: 1.6;">
+            Bạn đã sẵn sàng chưa?<br>
+            Hãy cùng mình nhìn lại hành trình yêu thương<br>
+            và chuẩn bị những lời chúc gửi đến chụy Tờ Linh nhó ✨
+        </p>
+        <button onclick="goToScreen('screen-journey')">Let's goooo✨</button>
+    </div>
+
+    <!-- MÀN HÌNH 2: HÀNH TRÌNH TỰ LƯỚT VÒNG TRÒN -->
+    <div id="screen-journey" class="screen">
+        <h2>Kỷ niệm đáng nhớ 🎞️</h2>
+        <p style="font-size:13px; color:#999; margin-bottom:10px;">Bạn có thể giữ vào ảnh để đọc thư đó nha 👆</p>
+        
+        <!-- Băng hình chạy -->
+        <div class="film-container">
+            <div class="film-track">
+                
+                <!-- BỘ HÌNH CHÍNH TỪ 1 ĐẾN 3 -->
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/kMx437n9/1.jpg" alt="Memory 1">
+                    <div class="note">...</div>
+                </div>
+                
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/YCdt39tK/2.jpg" alt="Memory 2">
+                    <div class="note">...</div>
+                </div>
+
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/kgT7c47m/3.jpg" alt="Memory 3">
+                    <div class="note">...</div>
+                </div>
+
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/vZy5FPR9/4.png" alt="Memory 4">
+                    <div class="note">...</div>
+                </div>
+
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/MGXqrSGw/5.jpg" alt="Memory 5">
+                    <div class="note">...</div>
+                </div>
+
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/pdyR1HdK/6.jpg" alt="Memory 6">
+                    <div class="note">...</div>
+                </div>
+
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/PqNTFjqY/7.jpg" alt="Memory 7">
+                    <div class="note">...</div>
+                </div>
+
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/MGXqrSG0/8.jpg" alt="Memory 8">
+                    <div class="note">...</div>
+                </div>
+
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/pTQt7XKh/9.jpg" alt="Memory 9">
+                    <div class="note">...</div>
+                </div>
+
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/9fSV6n4q/10.jpg" alt="Memory 10">
+                    <div class="note">...</div>
+                </div>
+
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/5tG1hRHQ/11.jpg" alt="Memory 11">
+                    <div class="note">...</div>
+                </div>
+
+                <!-- ĐỂ VÒNG LẶP LIÊN TỤC VÀ KHÔNG ĐỨT ĐOẠN, HÃY SAO CHÉP Y HỆT LẠI 3 BỨC TRÊN LẦN NỮA -->
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/kMx437n9/1.jpg" alt="Memory 1">
+                    <div class="note">...</div>
+                </div>
+                
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/YCdt39tK/2.jpg" alt="Memory 2">
+                    <div class="note">...</div>
+                </div>
+
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/kgT7c47m/3.jpg" alt="Memory 3">
+                    <div class="note">...</div>
+                </div>
+
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/vZy5FPR9/4.png" alt="Memory 4">
+                    <div class="note">...</div>
+                </div>
+
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/MGXqrSGw/5.jpg" alt="Memory 5">
+                    <div class="note">...</div>
+                </div>
+
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/pdyR1HdK/6.jpg" alt="Memory 6">
+                    <div class="note">...</div>
+                </div>
+
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/PqNTFjqY/7.jpg" alt="Memory 7">
+                    <div class="note">...</div>
+                </div>
+
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/MGXqrSG0/8.jpg" alt="Memory 8">
+                    <div class="note">...</div>
+                </div>
+
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/pTQt7XKh/9.jpg" alt="Memory 9">
+                    <div class="note">...</div>
+                </div>
+
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/9fSV6n4q/10.jpg" alt="Memory 10">
+                    <div class="note">...</div>
+                </div>
+
+                <div class="film-card">
+                    <img src="https://i.postimg.cc/5tG1hRHQ/11.jpg" alt="Memory 11">
+                    <div class="note">...</div>
+                </div>
+
+                <!-- Kết thúc băng -->
+
+            </div>
+        </div>
+
+        <button onclick="triggerSurprise()">Mở cánh cửa tiếp theo nhé 🎉</button>
+    </div>
+
+    <!-- MÀN HÌNH 3 (Cho LINH): ĐÁM MÂY LỜI CHÚC BAY LÊN -->
+    <div id="screen-surprise-linh" class="screen">
+        <h2 class="z-100">Cơn mưa tình yêu 🌧️💖</h2>
+        <p class="z-100" style="text-align: center; background: rgba(255,255,255,0.7); padding: 5px 15px; border-radius: 20px;">Đọc hết lời chúc nhé!</p>
+        <div id="wishes-container">
+            <!-- Bóng bay sẽ gen ra ở đây qua Javascript -->
+        </div>
+        <!-- Cố định nút quà ở dưới -->
+        <div class="z-100" style="position: absolute; bottom: 30px; width: 100%; text-align: center;">
+            <button onclick="goToScreen('screen-gift')">Nhận một món quà cuối nhé 🎁</button>
+        </div>
+    </div>
+
+    <!-- MÀN HÌNH 3 (Cho USER KHÁC): FORM GHI THIỆP CHÚC MỪNG -->
+    <div id="screen-surprise-guest" class="screen">
+        <h2>Thiệp xinh gửi chị Tờ Linh 💌</h2>
+        <p style="text-align:center; margin-bottom: 20px;">Chụy Tờ Linh của chúng ta đang bước sang tuổi mới.<br>Hãy viết một lời chúc gửi lên bầu trời kỉ niệm<br>để Linh cùng đọc được nhé! ☁️</p>
+        <textarea id="wishInput" placeholder="Ví dụ: Chúc Linh tuổi mới nhiều khách, file không bao giờ lỗi..."></textarea>
+        <button onclick="submitWish()">Gửi thiệp đi nè 🚀</button>
+    </div>
+
+    <!-- MÀN HÌNH 4: HỘP QUÀ & PHẦN QUÀ HÌNH ẢNH (CHUNG) -->
+    <div id="screen-gift" class="screen">
+    <!-- Lời nhắc xoay máy cho Linh -->
+    <div id="rotate-hint">
+        <div style="font-size: 50px; animation: rotating 2s infinite;">🔄</div>
+        <h2 style="color: white;">Chị Linh ơi!</h2>
+        <p style="color: white; font-weight: bold;">Xoay điện thoại lại để mở quà nhé!</p>
+    </div>
+
+    <div id="gift-content-wrapper" style="text-align: center; width: 100%;">
+        <div id="boom-blast"></div>
+        <div id="fireworks-container"></div>
+
+        <h2 id="gift-title-pre">Món quà cuối cùng...</h2>
+        <div class="gift-box" id="giftBoxElement" onclick="handleOpenGift()">🎁</div>
+        <p id="giftHint" style="font-weight:bold;">Chạm vào hộp quà để kích nổ! 💣</p>
+
+        <!-- PHẦN HIỆN QUÀ FULL MÀN HÌNH -->
+        <div id="giftResult">
+            <img src="https://i.postimg.cc/15g28rz4/12.jpg" id="finalImage" alt="Quà tặng">
+            <!-- Nút quay lại ở góc phải -->
+            <button class="btn-back-corner" id="btnBackToJourney" onclick="goToScreen('screen-journey')">⏪ Quay lại</button>
+        </div>
+    </div>
+</div>
+
+    <!-- Cấu trúc Custom Alert -->
+    <div id="custom-alert-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 9999; backdrop-filter: blur(4px); justify-content: center; align-items: center;">
+        <div id="custom-alert-box" style="background: white; padding: 30px; border-radius: 20px; width: 85%; max-width: 350px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popUp 0.3s ease-out;">
+            <div id="alert-icon" style="font-size: 40px; margin-bottom: 15px;">✨</div>
+            <p id="alert-message" style="font-size: 16px; color: #555; line-height: 1.5; margin-bottom: 25px; font-weight: 600;"></p>
+            <button onclick="closeCustomAlert()" style="margin-top: 0; width: 100%; background: linear-gradient(45deg, #ffb6b9, #ff8a8f);">Oki nè!</button>
+        </div>
+    </div>
+</div>
+
+<!-- THAY THẾ TOÀN BỘ TỪ ĐÂY ĐẾN HẾT THẺ SCRIPT CŨ -->
+<script type="module">
+    // 1. Nhúng thư viện Firebase Online
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    // 2. CẤU HÌNH FIREBASE (BẠN HÃY DÁN ĐOẠN CONFIG CỦA BẠN VÀO ĐÂY)
+    const firebaseConfig = {
+        apiKey: "AIzaSyAU2Bi_fgyoA96CPXJ806pIf9A1JxbMysg",
+        authDomain: "tolinh-76ef6.firebaseapp.com",
+        projectId: "tolinh-76ef6",
+        storageBucket: "tolinh-76ef6.firebasestorage.app",
+        messagingSenderId: "279512523111",
+        appId: "1:279512523111:web:9b40da27d233374b8c8fc2",
+        measurementId: "G-BPFL6JE5RC"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const wishesRef = ref(db, 'wishes');
+
+    // --- BIẾN TOÀN CỤC ---
+    let isMainLinh = false;
+    let alertCallback = null;
+
+    // --- CÁC HÀM TIỆN ÍCH (PHẢI GẮN VÀO WINDOW ĐỂ ONCLICK HOẠT ĐỘNG) ---
+
+    window.goToScreen = function(screenId) {
+        document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+        checkRotationRequirement();
+    };
+
+    window.handleLogin = function() {
+        let name = document.getElementById('usernameInput').value.trim();
+        if(!name) { customAlert('Nhập tên xưng danh bạn ơi ^^!', '🌸'); return; }
+        let normalizedName = name.toLowerCase();
+        if(normalizedName.includes('linh')) {
+            isMainLinh = true;
+            goToScreen('screen-welcome-linh');
+        } else {
+            isMainLinh = false;
+            document.getElementById('guestWelcomeTitle').innerText = `Hế nhô ${name}! 🥳`;
+            goToScreen('screen-welcome-guest');
+        }
+    };
+
+    window.triggerSurprise = function() {
+        if(isMainLinh) {
+            goToScreen('screen-surprise-linh');
+            startFloatingWishes();
+        } else {
+            goToScreen('screen-surprise-guest');
+        }
+    };
+
+    window.customAlert = function(message, icon = '✨', callback = null) {
+        document.getElementById('alert-message').innerText = message;
+        document.getElementById('alert-icon').innerText = icon;
+        document.getElementById('custom-alert-overlay').style.display = 'flex';
+        alertCallback = callback;
+    };
+
+    window.closeCustomAlert = function() {
+        document.getElementById('custom-alert-overlay').style.display = 'none';
+        if (alertCallback) { alertCallback(); alertCallback = null; }
+    };
+
+    // --- LOGIC FIREBASE (GỬI & NHẬN LỜI CHÚC) ---
+
+    window.submitWish = function() {
+        let content = document.getElementById('wishInput').value.trim();
+        if(!content) { customAlert('Nhập xíu tâm tình cho chủ tiệc vui nha ^^!', '✍️'); return; }
+        
+        push(wishesRef, { text: content, timestamp: Date.now() }).then(() => {
+            customAlert("Thiệp đã trao tận tay chị Linh rồi nhó!", '🚀', function() {
+                goToScreen('screen-gift');
+            });
+        });
+    };
+
+    function startFloatingWishes() {
+        const container = document.getElementById('wishes-container');
+        onValue(wishesRef, (snapshot) => {
+            container.innerHTML = ''; 
+            const data = snapshot.val();
+            if (data) {
+                Object.values(data).forEach((item, index) => {
+                    let el = document.createElement('div');
+                    el.className = 'cloud-wish';
+                    el.innerText = item.text;
+                    el.style.left = Math.floor(Math.random() * 60) + 10 + "%";
+                    el.style.animationDelay = (index * 2) + "s";
+                    container.appendChild(el);
+                });
+            }
+        });
+    }
+
+    // --- LOGIC QUÀ TẶNG & HIỆU ỨNG (BOOM/PHÁO HOA/XOAY MÁY) ---
+
+    window.checkRotationRequirement = function() {
+        const hint = document.getElementById('rotate-hint');
+        const giftContent = document.getElementById('gift-content-wrapper');
+        const isPortrait = window.innerHeight > window.innerWidth;
+        const currentScreen = document.querySelector('.screen.active');
+        if (currentScreen && currentScreen.id === 'screen-gift') {
+            if (isMainLinh && isPortrait) {
+                hint.style.display = 'flex'; giftContent.style.display = 'none';
+            } else {
+                hint.style.display = 'none'; giftContent.style.display = 'block';
+            }
+        }
+    };
+    window.addEventListener('resize', checkRotationRequirement);
+
+    window.handleOpenGift = function() {
+        if (isMainLinh && window.innerHeight > window.innerWidth) {
+            customAlert("Xoay ngang điện thoại đã chị ơi!", "🔄"); return;
+        }
+        const container = document.getElementById('app-container');
+        const blast = document.getElementById('boom-blast');
+        container.classList.add('shake-hard');
+        setTimeout(() => {
+            container.classList.remove('shake-hard');
+            blast.classList.add('blast-active');
+            setTimeout(() => {
+                document.getElementById('giftBoxElement').style.display = 'none';
+                document.getElementById('giftHint').style.display = 'none';
+                document.getElementById('gift-title-pre').style.display = 'none';
+                const giftResult = document.getElementById('giftResult');
+                giftResult.style.display = 'flex';
+                setTimeout(() => giftResult.classList.add('active-show'), 50);
+                const fireworkInterval = setInterval(launchFirework, 400);
+                setTimeout(() => clearInterval(fireworkInterval), 5000);
+                setTimeout(() => { document.getElementById('btnBackToJourney').style.opacity = '1'; }, 2500);
+            }, 150); 
+        }, 1200);
+    };
+
+    function launchFirework() {
+        const container = document.getElementById('fireworks-container');
+        const originX = Math.random() * 100; const originY = Math.random() * 100;
+        const colors = ['#ff6f69', '#ffd700', '#bbded6', '#ff00ff', '#00ffff'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        for (let i = 0; i < 40; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'firework';
+            const angle = (i / 40) * Math.PI * 2;
+            const velocity = Math.random() * 200 + 100;
+            particle.style.background = color;
+            particle.style.left = originX + '%'; particle.style.top = originY + '%';
+            particle.style.setProperty('--x', Math.cos(angle) * velocity + 'px');
+            particle.style.setProperty('--y', Math.sin(angle) * velocity + 'px');
+            particle.style.animation = `fireworkExplode 1.5s cubic-bezier(0, 0.5, 0.5, 1) forwards`;
+            container.appendChild(particle);
+            setTimeout(() => particle.remove(), 1500);
+        }
+    }
+</script>
+</body>
+</html>
