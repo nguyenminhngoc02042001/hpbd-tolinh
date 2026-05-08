@@ -448,7 +448,11 @@
             transition: opacity 1s;
             margin-top: 0 !important;
         }
-
+        button:disabled {
+            background: #ccc !important;
+            cursor: not-allowed;
+            transform: scale(1) !important;
+        }
     </style>
 </head>
 <body>
@@ -640,7 +644,8 @@
     <!-- Lời nhắc xoay máy cho Linh -->
     <div id="rotate-hint">
         <div style="font-size: 50px; animation: rotating 2s infinite;">🔄</div>
-        <h2 style="color: white;">Chị Linh ơi!</h2>
+        <!-- Chỗ này sẽ dùng JS để đổi chữ "Chị Linh" thành tên khách -->
+        <h2 id="rotate-user-name" style="color: white;">Bạn ơi!</h2>
         <p style="color: white; font-weight: bold;">Nhanh lên...Xoay điện thoại lại để mở quà nè!</p>
     </div>
 
@@ -758,19 +763,42 @@
 
     // --- GỬI LỜI CHÚC ---
     window.submitWish = function() {
-        let content = document.getElementById('wishInput').value.trim();
-        if(!content) { window.customAlert('Nhập xíu tâm tình cho chủ tiệc vui nha ^^!', '✍️'); return; }
-        
-        push(wishesRef, { 
-            sender: window.currentUser, 
-            text: content, 
-            timestamp: Date.now() 
-        }).then(() => {
-            window.customAlert("Thiệp đã trao tận tay chị Tờ Linh rồi nhó!", '🚀', function() {
-                window.goToScreen('screen-gift');
-            });
+    let btn = event.target; // Lấy cái nút vừa nhấn
+    let content = document.getElementById('wishInput').value.trim();
+    
+    if(!content) { 
+        window.customAlert('Nhập xíu tâm tình cho chủ tiệc vui nha ^^!', '✍️'); 
+        return; 
+    }
+
+    // 1. Trạng thái chờ: Đổi màu nút và chặn nhấn liên tục
+    btn.disabled = true;
+    btn.innerHTML = "Đang gửi đi... ⏳";
+    btn.style.opacity = "0.7";
+
+    // 2. Gửi lên Firebase
+    push(wishesRef, { 
+        sender: window.currentUser, 
+        text: content, 
+        timestamp: Date.now() 
+    })
+    .then(() => {
+        // 3. Thành công
+        window.customAlert("Thiệp đã trao tận tay chị Tờ Linh rồi nhó!", '🚀', function() {
+            window.goToScreen('screen-gift');
         });
-    };
+    })
+    .catch((error) => {
+        // 4. Xử lý nếu có lỗi mạng
+        console.error("Lỗi Firebase:", error);
+        window.customAlert("Mạng hơi yếu, mình bấm gửi lại nhé!", "❌");
+        
+        // Trả lại trạng thái nút ban đầu để người dùng nhấn lại
+        btn.disabled = false;
+        btn.innerHTML = "Gửi thiệp đi nè 🚀";
+        btn.style.opacity = "1";
+    });
+};
 
     // --- LỜI CHÚC BAY LÊN ---
     function startFloatingWishes() {
@@ -795,42 +823,67 @@
     window.checkRotationRequirement = function() {
         const hint = document.getElementById('rotate-hint');
         const giftContent = document.getElementById('gift-content-wrapper');
+        const rotateName = document.getElementById('rotate-user-name');
         const isPortrait = window.innerHeight > window.innerWidth;
         const currentScreen = document.querySelector('.screen.active');
 
         if (currentScreen && currentScreen.id === 'screen-gift') {
-            if (window.isMainLinh === true && isPortrait) {
+            // Cập nhật tên người dùng vào lời nhắc cho thân thiện
+            rotateName.innerText = window.currentUser + " ơi!";
+
+            if (isPortrait) {
+                // Cứ là màn hình đứng thì hiện nhắc xoay, bất kể là ai
                 hint.style.display = 'flex'; 
                 giftContent.style.display = 'none';
             } else {
+                // Đã xoay ngang thì hiện hộp quà
                 hint.style.display = 'none'; 
                 giftContent.style.display = 'block';
             }
         }
     };
-    window.addEventListener('resize', window.checkRotationRequirement);
 
-    // --- MỞ QUÀ & HIỆU ỨNG ---
+    // --- MỞ QUÀ & HIỆU ỨNG (ÁP DỤNG CHO TẤT CẢ) ---
     window.handleOpenGift = function() {
-        if (window.isMainLinh === true && window.innerHeight > window.innerWidth) {
-            window.customAlert("Xoay ngang điện thoại đã chị ơi!", "🔄"); return;
+        const isPortrait = window.innerHeight > window.innerWidth;
+        
+        // Nếu cố tình nhấn lúc đang đứng thì nhắc lại
+        if (isPortrait) {
+            window.customAlert("Xoay ngang điện thoại đã bạn ơi!", "🔄"); 
+            return;
         }
+
         const container = document.getElementById('app-container');
         const blast = document.getElementById('boom-blast');
+        
+        // 1. Rung mạnh
         container.classList.add('shake-hard');
+        
         setTimeout(() => {
+            // 2. Kích nổ
             container.classList.remove('shake-hard');
             blast.classList.add('blast-active');
+            
             setTimeout(() => {
+                // 3. Ẩn hộp quà, hiện ảnh full
                 document.getElementById('giftBoxElement').style.display = 'none';
                 document.getElementById('giftHint').style.display = 'none';
                 document.getElementById('gift-title-pre').style.display = 'none';
+                
                 const giftResult = document.getElementById('giftResult');
                 giftResult.style.display = 'flex';
+                
+                // Hiệu ứng Fade-in
                 setTimeout(() => giftResult.classList.add('active-show'), 50);
+                
+                // Bắn pháo hoa
                 const fireworkInterval = setInterval(launchFirework, 400);
                 setTimeout(() => clearInterval(fireworkInterval), 5000);
-                setTimeout(() => { document.getElementById('btnBackToJourney').style.opacity = '1'; }, 2500);
+                
+                // Hiện nút quay lại
+                setTimeout(() => { 
+                    document.getElementById('btnBackToJourney').style.opacity = '1'; 
+                }, 2500);
             }, 150); 
         }, 1200);
     };
