@@ -2,8 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Happy Birthday Linh!</title>
@@ -39,17 +38,17 @@
         /* Mô phỏng khung điện thoại nếu mở trên máy tính */
         #app-container {
             width: 100%;
-            max-width: 1500px;
-            height: 100vh;
-            max-height: 850px;
+            max-width: 100vw;
+            /* Thay height: 100vh; bằng 2 dòng dưới đây */
+            height: 100vh; 
+            height: 100dvh; 
+            max-height: none; /* Xóa bỏ giới hạn 850px để nó tràn hết máy */
             position: relative;
             background: rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            transition: all 0.5s ease;
         }
 
         .screen {
@@ -136,8 +135,16 @@
             padding-left: 20px; 
         }
 
-        .film-track:hover {
-            animation-play-state: paused; /* Bấm đè ngón tay sẽ ngừng chạy */
+        /* Xóa bỏ :hover cũ, thay bằng class .paused này */
+        .film-track.paused {
+            animation-play-state: paused !important;
+        }
+
+        /* Thêm hiệu ứng cho tấm ảnh đang được đọc cho xịn */
+        .film-card.active-read {
+            transform: scale(1.05) rotate(0deg) !important;
+            z-index: 100;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
 
         .film-card {
@@ -1390,6 +1397,34 @@
         document.getElementById('btn-alert-ok').innerText = "Oki nè!";
         originalClose();
     };
+    document.addEventListener('DOMContentLoaded', function() {
+        const track = document.querySelector('.film-track');
+        const cards = document.querySelectorAll('.film-card');
+
+        cards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                e.stopPropagation(); // Ngăn sự kiện chạm bị lan ra ngoài
+                
+                // Nếu ảnh này đã đang mở, thì đóng lại và chạy tiếp
+                if (this.classList.contains('active-read')) {
+                    this.classList.remove('active-read');
+                    track.classList.remove('paused');
+                } else {
+                    // Xóa trạng thái của các ảnh khác
+                    cards.forEach(c => c.classList.remove('active-read'));
+                    // Dừng phim và phóng nhẹ ảnh này lên
+                    this.classList.add('active-read');
+                    track.classList.add('paused');
+                }
+            });
+        });
+
+        // KHI NHẤN RA NGOÀI VÙNG TRỐNG (TRÊN MÀN HÌNH JOURNEY)
+        document.getElementById('screen-journey').addEventListener('click', function() {
+            cards.forEach(c => c.classList.remove('active-read'));
+            track.classList.remove('paused');
+        });
+    });
 </script>
 </body>
 </html>
