@@ -396,7 +396,9 @@
 
         @keyframes rotating {
             0% { transform: rotate(0deg); }
-            50% { transform: rotate(90deg); }
+            25% { transform: rotate(15deg); }
+            50% { transform: rotate(0deg); }
+            75% { transform: rotate(-15deg); }
             100% { transform: rotate(0deg); }
         }
 
@@ -707,6 +709,20 @@
             <button class="btn-back-corner" id="btnBackToJourney" onclick="goToScreen('screen-journey')">⏪ Quay lại</button>
         </div>
     </div>
+</div>
+
+<!-- KHÓA 1: Bắt xoay ĐỨNG (Dành cho màn 1, 2, 3) -->
+<div id="hint-must-portrait" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: #ffb6b9; z-index: 99999; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white;">
+    <div style="font-size: 80px; animation: rotating 2s infinite;">📱</div>
+    <h2 style="color: white; margin-top: 20px;">Xoay đứng máy lại nè!</h2>
+    <p style="padding: 0 20px;">Giao diện này cần xem ở màn hình đứng mới đẹp nhó!</p>
+</div>
+
+<!-- KHÓA 2: Bắt xoay NGANG (Dành cho màn 4) -->
+<div id="hint-must-landscape" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: #ffb6b9; z-index: 99999; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white;">
+    <div style="font-size: 80px; transform: rotate(90deg); animation: rotating 2s infinite;">📱</div>
+    <h2 id="rotate-user-name" style="color: white; margin-top: 20px;">Bạn ơi!</h2>
+    <p style="padding: 0 20px;">Xoay ngang máy ngay để khui quà siêu to khổng lồ nhé! 🎁</p>
 </div>
 
     <!-- Cấu trúc Custom Alert -->
@@ -1045,37 +1061,56 @@
         const giftContent = document.getElementById('gift-content-wrapper');
         const rotateName = document.getElementById('rotate-user-name');
         
-        // Lấy trạng thái máy: Cao > Rộng là Đứng (Portrait)
+        // Kiểm tra tư thế máy thực tế
         const isPortrait = window.innerHeight > window.innerWidth;
 
-        // Cập nhật tên người dùng cho màn 4
-        if(rotateName) rotateName.innerText = window.currentUser + " ơi!";
+        // Cập nhật tên người dùng
+        if(rotateName) rotateName.innerText = (window.currentUser || "Bạn") + " ơi!";
 
-        // --- LOGIC BẮT BUỘC ---
+        // --- LOGIC KHÓA MÀN HÌNH ---
         if (currentScreen.id === 'screen-gift') {
-            // MÀN 4: BẮT BUỘC NGANG
+            // MÀN 4 (QUÀ TẶNG): BẮT BUỘC NGANG
             if (isPortrait) {
-                hintLandscape.style.display = 'flex';
+                hintLandscape.style.display = 'flex'; // Hiện cảnh báo bắt xoay ngang
                 hintPortrait.style.display = 'none';
                 if(giftContent) giftContent.style.display = 'none';
             } else {
-                hintLandscape.style.display = 'none';
+                hintLandscape.style.display = 'none'; // Ẩn cảnh báo khi đã xoay ngang
                 if(giftContent) giftContent.style.display = 'block';
             }
         } else {
-            // CÁC MÀN CÒN LẠI (1, 2, 3, Video): BẮT BUỘC ĐỨNG
+            // TẤT CẢ MÀN CÒN LẠI: BẮT BUỘC ĐỨNG
             if (!isPortrait) {
-                // Nếu người dùng đang để máy NGANG ở các màn này
-                hintPortrait.style.display = 'flex';
+                hintPortrait.style.display = 'flex'; // Hiện cảnh báo bắt xoay đứng
                 hintLandscape.style.display = 'none';
             } else {
-                // Đã để máy ĐỨNG đúng chuẩn
-                hintPortrait.style.display = 'none';
-                hintLandscape.style.display = 'none';
+                hintPortrait.style.display = 'none'; // Ẩn cảnh báo khi đã xoay đứng
             }
         }
     };
 
+    // Kích hoạt ngay khi xoay máy hoặc thay đổi kích thước
+    window.addEventListener('resize', window.checkRotationRequirement);
+    window.addEventListener('orientationchange', window.checkRotationRequirement);
+
+    // Cập nhật hàm goToScreen để kiểm tra tư thế ngay khi vừa chuyển màn hình
+    const originalGoToScreen = window.goToScreen;
+    window.goToScreen = function(screenId) {
+        // Gọi lại hàm cũ
+        if (typeof originalGoToScreen === 'function') {
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+            const target = document.getElementById(screenId);
+            if(target) target.classList.add('active');
+        }
+        
+        // Dừng âm thanh/video như cũ bạn đã làm ở đây...
+        const video = document.getElementById('birthdayVideo');
+        if (video) { video.pause(); video.currentTime = 0; }
+        if (window.idleTimer) { clearTimeout(window.idleTimer); window.idleTimer = null; }
+
+        // KIỂM TRA XOAY MÁY NGAY LẬP TỨC
+        window.checkRotationRequirement();
+    };
     // Lắng nghe sự kiện xoay máy liên tục
     window.addEventListener('resize', window.checkRotationRequirement);
     window.addEventListener('orientationchange', window.checkRotationRequirement);
