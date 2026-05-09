@@ -2,760 +2,391 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#fae3d9">
     <title>Happy Birthday Linh!</title>
     <!-- Thêm font chữ siêu cute từ Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Pacifico&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --primary: #ffb6b9;
-            --secondary: #fae3d9;
-            --accent: #bbded6;
-            --text-color: #555;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Quicksand', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, var(--secondary) 0%, #ffecd2 100%);
-            color: var(--text-color);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden; /* Tránh cuộn ngang dọc không mong muốn */
-        }
-
-        /* Mô phỏng khung điện thoại nếu mở trên máy tính */
-        #app-container {
-            width: 100%;
-            max-width: 100vw;
-            /* Thay height: 100vh; bằng 2 dòng dưới đây */
-            height: 100vh; 
-            height: 100dvh; 
-            max-height: none; /* Xóa bỏ giới hạn 850px để nó tràn hết máy */
-            position: relative;
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(10px);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .screen {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease, transform 0.5s ease;
-            transform: scale(0.95);
-        }
-
-        .screen.active {
-            opacity: 1;
-            pointer-events: auto;
-            transform: scale(1);
-            z-index: 10;
-        }
-
-        h1, h2 {
-            font-family: 'Pacifico', cursive;
-            font-size: 33px;
-            color: #ff6f69;
-            text-align: center;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-
-        textarea { height: 120px; resize: none; font-family: 'Dancing Script', cursive; font-size: 1.5rem; color: #e91e63;}
-        input, textarea {
-            width: 30%;
-            padding: 15px;
-            border-radius: 15px;
-            border: 2px solid white;
-            background: rgba(255,255,255,0.7);
-            font-size: 16px;
-            margin-bottom: 20px;
-            outline: none;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
-            transition: border 0.3s;
-        }
-        
-        input:focus, textarea:focus { border-color: var(--primary); }
-        textarea { height: 120px; resize: none; }
-
-        button {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 25px;
-            background: linear-gradient(45deg, var(--primary), #ff8a8f);
-            color: white;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(255, 182, 185, 0.5);
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 10px;
-        }
-
-        button:active {
-            transform: scale(0.95);
-        }
-
-        /* --------- Slide Hành trình (BẢN KHUNG POLAROID ẢNH NGANG) --------- */
-        .film-container {
-            width: 100vw;
-            margin-left: -20px;
-            overflow-x: auto; /* Cho phép cuộn ngang */
-            overflow-y: hidden;
-            cursor: grab;
-            padding: 20px 0;
-            -webkit-overflow-scrolling: touch; /* Cuộn mượt trên iPhone */
-            scrollbar-width: none; /* Ẩn scrollbar trên Firefox */
-        }
-
-        .film-container::-webkit-scrollbar {
-            display: none; /* Ẩn scrollbar trên Chrome/Safari */
-        }
-
-        .film-track {
-            display: flex;
-            gap: 20px;
-            width: max-content;
-            padding-left: 20px;
-            padding-right: 20px;
-            /* Bỏ animation CSS cũ, chúng ta sẽ dùng JS để điều khiển mượt hơn */
-            animation: none !important; 
-        }
-
-        /* --- 2. FIX NÚT BẤM KHI XOAY NGANG (LANDSCAPE) --- */
-        @media (orientation: landscape) and (max-height: 500px) {
-            #screen-journey {
-                justify-content: flex-start !important; /* Dàn từ trên xuống */
-                padding-top: 5px !important;
-            }
-
-            #screen-journey h2 {
-                font-size: 18px !important;
-                margin-bottom: 5px !important;
-            }
-
-            .film-container {
-                padding: 5px 0 !important;
-                margin-bottom: 5px !important;
-            }
-
-            .film-card {
-                width: 150px !important;
-                padding: 5px !important;
-            }
-
-            .film-card img {
-                height: 80px !important;
-            }
-
-            /* NÚT BẤM: Biến thành nút nổi ở góc phải để không đè chữ */
-            #screen-journey button {
-                position: fixed;
-                bottom: 15px;
-                right: 20px;
-                width: auto !important;
-                padding: 8px 20px !important;
-                font-size: 12px !important;
-                z-index: 1000;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            }
-        }
-
-        /* Xóa bỏ :hover cũ, thay bằng class .paused này */
-        .film-track.paused {
-            animation-play-state: paused !important;
-        }
-
-        /* Thêm hiệu ứng cho tấm ảnh đang được đọc cho xịn */
-        .film-card.active-read {
-            transform: scale(1.05) rotate(0deg) !important;
-            z-index: 100;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        }
-
-        .film-card {
-            width: 300px; /* Bề ngang nới rộ rộng bự hơn cho khớp form hình gốc ngang! */
-            background: #fff;
-            padding: 10px 10px 15px 10px;
-            border-radius: 12px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
-            display: flex;
-            flex-direction: column;
-            transform: rotate(-3deg); 
-            transition: transform 0.3s ease;
-        }
-
-        .film-card:nth-child(even) {
-            transform: rotate(3deg) translateY(10px);
-        }
-
-        .film-card img {
-            width: 100%;
-            height: 180px; /* Khống chế chiều lùn form ngang (Landscape) tự động theo lề 300px */
-            object-fit: cover; 
-            border-radius: 8px;
-        }
-
-        .film-card img, #finalImage {
-            /* ... giữ các code cũ ... */
-            
-            /* Thêm các dòng này để ảnh sắc nét hơn */
-            image-rendering: -webkit-optimize-contrast; /* Dành cho Safari/Chrome */
-            image-rendering: crisp-edges;
-            backface-visibility: hidden; /* Giúp ảnh không bị mờ khi thực hiện hiệu ứng transition */
-        }
-
-        .film-card .note {
-            font-family: 'Pacifico', cursive; 
-            color: #d15c7e;
-            text-align: center;
-            font-size: 16px;
-            margin-top: 15px;
-            line-height: 1.2;
-        }
-
-        @keyframes scroll-left {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(calc(-50% - 10px)); } 
-        }
-        
-        /* Giao diện Bất ngờ Linh - Đám mây & Bong bóng bay (Step 3) */
-        #screen-surprise-linh {
-            justify-content: flex-start;
-            padding-top: 50px;
-        }
-        .cloud-wish {
-            position: absolute;
-            bottom: -100px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 15px 20px;
-            border-radius: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            animation: floatUp 8s linear infinite;
-            max-width: 80%;
-            text-align: center;
-            font-weight: bold;
-            color: #d15c7e;
-        }
-
-        @keyframes floatUp {
-            to { transform: translateY(-100vh); }
-        }
-
-        /* Hộp quà và Quà tặng (Step 4) */
-        .gift-box {
-            font-size: 100px;
-            cursor: pointer;
-            animation: shake 2s infinite cubic-bezier(.36,.07,.19,.97) both;
-            transform-origin: bottom;
-        }
-
-        .gift-image-wrapper {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-        
-        .gift-image-wrapper img {
-            width: 250px;
-            border-radius: 20px;
-            border: 5px solid white;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: rotate(0deg); }
-            10%, 30%, 50%, 70%, 90% { transform: rotate(-5deg); }
-            20%, 40%, 60%, 80% { transform: rotate(5deg); }
-        }
-
-        @keyframes popUp {
-            0% { transform: scale(0); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .z-100 { z-index: 100; position: relative;}
-        @media (orientation: landscape) and (max-height: 500px) {
-            input, textarea {
-                width: 100%;
-            }
-        }
-
-        @media (orientation: portrait) and (max-height: 850px) {
-            input, textarea {
-                width: 80%;
-            }
-        }
-
-        /* --- FIX GIAO DIỆN KHI XOAY NGANG ĐIỆN THOẠI --- */
-        @media (orientation: landscape) and (max-height: 500px) {
-            /* 1. Căn giữa toàn bộ nội dung màn hình theo chiều dọc */
-            #screen-journey {
-                justify-content: center !important; 
-                padding: 5px !important;
-            }
-
-            /* 2. Thu nhỏ tiêu đề và bỏ margin thừa */
-            #screen-journey h2 {
-                font-size: 18px !important;
-                margin-bottom: 2px !important;
-                margin-top: 0 !important;
-            }
-
-            /* 3. Thu hẹp tối đa khoảng cách của container ảnh */
-            .film-container {
-                margin-top: 0 !important;
-                margin-bottom: 5px !important; /* Chỉ cách nút 5px */
-                padding: 5px 0 !important;
-            }
-
-            .film-card {
-                width: 160px !important; /* Giữ kích thước thon gọn */
-                padding: 5px !important;
-            }
-
-            .film-card img {
-                height: 90px !important;
-            }
-
-            /* 4. ĐƯA NÚT BẤM VỀ SÁT HÌNH ẢNH */
-            #screen-journey button {
-                position: relative !important; /* Bỏ fixed để nó đi theo sau khối ảnh */
-                bottom: auto !important;
-                right: auto !important;
-                margin-top: 0 !important; /* Xóa margin top để gần hình hơn */
-                padding: 8px 25px !important;
-                font-size: 12px !important;
-                width: auto !important;
-                align-self: center; /* Căn giữa nút (nếu muốn nằm phải thì đổi thành flex-end) */
-                box-shadow: 0 4px 10px rgba(255, 111, 105, 0.3);
-            }
-        }
-        /* Style cho Custom Alert */
-        #custom-alert-overlay {
-            display: none; /* Mặc định ẩn */
-        }
-
-        @media (orientation: landscape) and (max-height: 500px) {
-            #custom-alert-box {
-                padding: 15px;
-                max-width: 300px;
-            }
-            #alert-icon { font-size: 25px; margin-bottom: 5px; }
-            #alert-message { margin-bottom: 15px; font-size: 14px; }
-        }
-        /* Lời nhắc xoay điện thoại (Chỉ hiện ở Portrait Mobile) */
-        #rotate-hint {
-            display: none; /* JS sẽ điều khiển cái này */
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 182, 185, 0.98);
-            z-index: 200;
-            text-align: center;
-            padding: 20px;
-        }
-
-        /* Thêm hiệu ứng xoay cho icon */
-        @keyframes rotating {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* Hiệu ứng Rung màn hình */
-        .shake-screen {
-            animation: shakeScreen 0.5s infinite;
-        }
-
-        @keyframes shakeScreen {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            100% { transform: translate(1px, 1px) rotate(0deg); }
-        }
-
-        /* Hiệu ứng Nổ Boom (Flash trắng) */
-        #boom-effect {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: white;
-            opacity: 0;
-            z-index: 1000;
-            pointer-events: none;
-        }
-
-        .boom-active {
-            animation: boomFlash 0.6s ease-out;
-        }
-
-        @keyframes boomFlash {
-            0% { opacity: 0; }
-            10% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-
-        /* Hình ảnh quà tặng phát sáng */
-        .glow-image {
-            box-shadow: 0 0 20px #fff, 0 0 40px #ffb6b9, 0 0 60px #ffb6b9;
-            animation: imageGlow 2s infinite alternate;
-            width: 80% !important; /* Ưu tiên hiển thị ngang */
-            max-width: 600px !important;
-        }
-
-        @keyframes imageGlow {
-            from { filter: drop-shadow(0 0 5px #fff); }
-            to { filter: drop-shadow(0 0 20px #ffb6b9); }
-        }
-        /* Hiệu ứng Nổ thực tế */
-        #boom-blast {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 10px; height: 10px;
-            background: radial-gradient(circle, #fff 0%, #ff6f69 40%, #ff8a8f 70%, transparent 100%);
-            border-radius: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            z-index: 999;
-            pointer-events: none;
-        }
-
-        .blast-active {
-            animation: blastAnim 0.8s ease-out forwards;
-        }
-
-        @keyframes blastAnim {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
-            50% { opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(150); opacity: 0; }
-        }
-
-        /* Hiệu ứng Pháo hoa (Fireworks) */
-        .firework {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            z-index: 2000;
-            pointer-events: none;
-        }
-
-        @keyframes fireworkExplode {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            50% { opacity: 1; filter: brightness(1.5); } /* Hiệu ứng lấp lánh giữa chừng */
-            100% { 
-                transform: translate(var(--x), var(--y)) scale(0); 
-                opacity: 0; 
-                filter: blur(1px); /* Làm mờ đuôi pháo */
-            }
-        }
-
-        /* Hiệu ứng Fade-in cho Gift Result (Hình ảnh quà tặng) */
-        #giftResult {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: #000;
-            display: none; /* Sẽ đổi thành flex bởi JS */
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            overflow: hidden;
-            /* Hiệu ứng mượt mà */
-            opacity: 0;
-            transition: opacity 2s ease-in-out; 
-        }
-
-        /* Class kích hoạt hiện hình ảnh */
-        #giftResult.active-show {
-            opacity: 1;
-        }
-
-        #finalImage {
-            width: 100%;
-            height: 100%;
-            /* Đổi contain thành cover để lấp đầy màn hình */
-            object-fit: contain; 
-            transform: scale(1.1);
-            transition: transform 3s ease-out;
-        }
-
-        #giftResult.active-show #finalImage {
-            transform: scale(1);
-        }
-        /* Nút quay lại nằm ở góc trên bên phải */
-        .btn-back-corner {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            z-index: 1100;
-            padding: 10px 15px !important;
-            font-size: 12px !important;
-            background: rgba(255, 255, 255, 0.3) !important;
-            backdrop-filter: blur(5px);
-            border: 1px solid white !important;
-            opacity: 0; /* Mặc định ẩn, hiện sau khi nổ */
-            transition: opacity 1s;
-            margin-top: 0 !important;
-        }
-        button:disabled {
-            background: #ccc !important;
-            cursor: not-allowed;
-            transform: scale(1) !important;
-        }
-        /* Style cho màn hình Video */
-        .video-wrapper {
-            width: 75%; /* Thu hẹp lại để thon gọn giống đt */
-            max-width: 320px; /* Giới hạn độ rộng chuẩn TikTok */
-            aspect-ratio: 9 / 16; /* Ép khung hình về tỉ lệ dọc chuẩn */
-            position: relative;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 15px 35px rgba(255, 111, 105, 0.3);
-            background: #000; /* Nền đen để nếu clip ko khít vẫn nhìn sang */
-            border: 4px solid white;
-            margin: 0 auto;
-            animation: videoEntry 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* QUAN TRỌNG: Làm video lấp đầy khung hình, không bị khoảng đen */
-            display: block;
-        }
-
-        /* Điều chỉnh tiêu đề video cho gọn */
-        #video-title {
-            font-size: 24px !important;
-            margin-bottom: 15px !important;
-        }
-
-        /* Khi xoay ngang điện thoại: Thu nhỏ video để không bị lòi ra ngoài màn hình */
-        @media (orientation: landscape) and (max-height: 500px) {
-            .video-wrapper {
-                width: 180px; /* Thu cực nhỏ khi máy nằm ngang */
-                max-width: 180px;
-                margin-top: -10px; /* Đẩy lên trên xíu cho thoáng */
-            }
-            #video-title {
-                font-size: 18px !important;
-                margin-bottom: 5px !important;
-            }
-        }
-        @keyframes videoEntry {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .play-icon {
-            font-size: 60px;
-            margin-bottom: 10px;
-            filter: drop-shadow(0 0 10px white);
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        /* Khi xoay ngang điện thoại */
-        @media (orientation: landscape) and (max-height: 500px) {
-            .video-wrapper {
-                width: 70%;
-                max-width: 400px;
-            }
-        }
-
-        /* Nút Skip nhỏ xinh nằm góc video */
-        .btn-skip {
-            display: inline-block;
-            padding: 6px 18px !important;
-            font-size: 12px !important;
-            background: rgba(255, 111, 105, 0.1) !important; /* Màu hồng nhạt trong suốt */
-            backdrop-filter: blur(5px);
-            border: 1px solid rgb(255, 111, 105) !important;
-            color: rgb(255, 111, 105) !important;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .btn-skip:hover {
-            background: var(--primary) !important;
-            color: white !important;
-        }
-
-        /* Style cho nút Hủy trong bảng thông báo */
-        #btn-alert-cancel {
-            background: #ccc !important;
-            margin-top: 10px;
-            width: 100%;
-        }
-        /* --- GIAO DIỆN MESSENGER CHUẨN: TỪNG LỚP, BÊN TRÁI --- */
-        #wishes-container {
-            width: 100%;
-            height: 65vh; /* Chiều cao cố định để cuộn */
-            overflow-y: auto; 
-            padding: 15px;
-            display: flex;
-            flex-direction: column; /* Xếp từ trên xuống dưới */
-            align-items: flex-start; /* Ép tất cả sang bên trái */
-            gap: 20px; /* Khoảng cách giữa các tin nhắn */
-            background: rgba(255, 255, 255, 0.2); /* Nền mờ nhẹ */
-            border-radius: 20px;
-        }
-
-        /* Ẩn thanh cuộn xấu xí */
-        #wishes-container::-webkit-scrollbar { display: none; }
-
-        .chat-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            max-width: 90%; /* Không để tin nhắn quá dài tràn màn hình */
-            opacity: 0;
-            transform: translateX(-20px); /* Hiệu ứng trượt từ trái sang */
-            animation: messageIn 0.5s ease forwards;
-        }
-
-        @keyframes messageIn {
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .chat-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            /* background: #ffb6b9; <-- Có thể xóa dòng này nếu muốn ảnh hiện nền của nó */
-            overflow: hidden; /* QUAN TRỌNG: Để ảnh không bị tràn ra ngoài vòng tròn */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-shrink: 0;
-            border: 2px solid white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .chat-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* Đảm bảo ảnh luôn đầy khung không bị méo */
-        }
-
-        .chat-bubble-wrapper {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sender-name {
-            font-size: 12px;
-            font-weight: bold;
-            color: #ff6f69;
-            margin-bottom: 4px;
-            margin-left: 5px;
-        }
-
-        .chat-bubble {
-            padding: 12px 18px;
-            background: white;
-            color: #444;
-            border-radius: 4px 20px 20px 20px;
-            font-size: 14px;
-            line-height: 1.5;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            
-            /* DÒNG QUAN TRỌNG NHẤT ĐÂY NÈ */
-            white-space: pre-wrap;  
-            
-            /* Giúp ngắt từ nếu người dùng cố tình gõ 1 từ quá dài */
-            word-break: break-word; 
-        }
-        /* Nút phong bì cạnh tiêu đề */
+<style>
+    :root {
+        --primary: #ffb6b9;
+        --secondary: #fae3d9;
+        --accent: #bbded6;
+        --text-color: #555;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Quicksand', sans-serif;
+    }
+
+    body {
+        background-color: #fae3d9; /* Fix thanh hồng trên đầu iPhone */
+        background: linear-gradient(135deg, var(--secondary) 0%, #ffecd2 100%);
+        color: var(--text-color);
+        /* Fix chiều cao Safari */
+        height: 100vh;
+        height: 100dvh; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    /* --- KHUNG CHỨA TỔNG SIÊU TỐI ƯU IPHONE --- */
+    #app-container {
+        width: 100%;
+        max-width: 1500px;
+        height: 100%;
+        height: 100dvh;
+        position: relative;
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        /* Xử lý vùng an toàn của iPhone (Tai thỏ & Thanh vuốt) */
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+
+    .screen {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.5s ease, transform 0.5s ease;
+        transform: scale(0.95);
+    }
+
+    .screen.active {
+        opacity: 1;
+        pointer-events: auto;
+        transform: scale(1);
+        z-index: 10;
+    }
+
+    h1, h2 {
+        font-family: 'Pacifico', cursive;
+        font-size: 33px;
+        color: #ff6f69;
+        text-align: center;
+        margin-bottom: 20px;
+        line-height: 1.3; /* Fix lỗi iPhone cắt dòng */
+    }
+
+    /* --- FORM NHẬP LIỆU --- */
+    input, textarea {
+        width: 30%; /* Tối ưu cho mobile */
+        padding: 15px;
+        border-radius: 15px;
+        border: 2px solid white;
+        background: rgba(255,255,255,0.7);
+        font-size: 16px;
+        margin-bottom: 20px;
+        outline: none;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        transition: border 0.3s;
+    }
+    /* Trên điện thoại đứng thì mới cho rộng ra 80% */
+    @media (orientation: portrait) {
+        input, textarea { width: 80% !important; }
+    }
+
+    textarea { 
+        height: 120px; 
+        resize: none; 
+        font-family: 'Dancing Script', cursive; 
+        font-size: 1.5rem; 
+        color: #e91e63;
+        white-space: pre-wrap; 
+    }
+    
+    input:focus, textarea:focus { border-color: var(--primary); }
+
+    button {
+        padding: 15px 30px;
+        border: none;
+        border-radius: 25px;
+        background: linear-gradient(45deg, var(--primary), #ff8a8f);
+        color: white;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: 0 5px 15px rgba(255, 182, 185, 0.5);
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-top: 10px;
+    }
+
+    button:disabled {
+        background: #ccc !important;
+        cursor: not-allowed;
+    }
+
+    /* --- SLIDE HÀNH TRÌNH (DRAG & POLAROID) --- */
+    .film-container {
+        width: 100vw;
+        margin-left: -20px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        cursor: grab;
+        padding: 20px 0;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .film-container::-webkit-scrollbar { display: none; }
+
+    .film-track {
+        display: flex;
+        gap: 20px;
+        width: max-content;
+        padding-left: 20px;
+        padding-right: 20px;
+        animation: none !important; 
+    }
+
+    .film-track.paused { animation-play-state: paused !important; }
+
+    .film-card {
+        width: 300px;
+        background: #fff;
+        padding: 10px;
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
+        display: flex;
+        flex-direction: column;
+        transform: rotate(-3deg); 
+        transition: transform 0.3s ease;
+    }
+
+    .film-card.active-read {
+        transform: scale(1.05) rotate(0deg) !important;
+        z-index: 100;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    .film-card:nth-child(even) { transform: rotate(3deg) translateY(10px); }
+
+    .film-card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover; 
+        border-radius: 8px;
+        image-rendering: -webkit-optimize-contrast;
+        backface-visibility: hidden;
+    }
+
+    .film-card .note {
+        font-family: 'Pacifico', cursive; 
+        color: #d15c7e;
+        text-align: center;
+        font-size: 16px;
+        margin-top: 15px;
+    }
+
+    /* --- VIDEO TIKTOK STYLE --- */
+    .video-wrapper {
+        width: 75%;
+        max-width: 320px;
+        aspect-ratio: 9 / 16;
+        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 15px 35px rgba(255, 111, 105, 0.3);
+        background: #000;
+        border: 4px solid white;
+        animation: videoEntry 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    video { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 15px; }
+
+    .btn-skip {
+        display: inline-block;
+        padding: 6px 18px !important;
+        font-size: 12px !important;
+        background: rgba(255, 111, 105, 0.1) !important;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgb(255, 111, 105) !important;
+        color: rgb(255, 111, 105) !important;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    /* --- GIAO DIỆN CHAT MESSENGER --- */
+    #wishes-container {
+        width: 100%;
+        height: 65vh;
+        overflow-y: auto; 
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .chat-item { display: flex; align-items: flex-start; gap: 10px; max-width: 90%; animation: messageIn 0.5s ease forwards; }
+
+    .chat-avatar {
+        width: 45px; height: 45px; border-radius: 50%;
+        overflow: hidden; display: flex; flex-shrink: 0;
+        border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .chat-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .chat-bubble {
+        padding: 12px 18px;
+        background: white;
+        color: #444;
+        border-radius: 4px 20px 20px 20px;
+        font-size: 14px;
+        white-space: pre-wrap; 
+        word-break: break-word;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    #btn-next-message {
+        font-size: 40px;
+        /* Khôi phục vòng tròn hồng mờ chuẩn Hình 3 */
+        background: rgba(255, 182, 185, 0.3) !important; 
+        border: none !important;
+        border-radius: 50%;
+        width: 70px;
+        height: 70px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        box-shadow: 0 0 20px rgba(255, 182, 185, 0.5) !important;
+        transition: transform 0.2s;
+    }
+
+    /* Container chứa tiêu đề và phong bì */
+    .envelope-container {
+        display: flex; /* Sử dụng Flexbox để đưa lên cùng hàng */
+        flex-direction: row;
+        align-items: center; /* Căn giữa theo chiều dọc */
+        justify-content: center; /* Căn giữa theo chiều ngang */
+        gap: 15px; /* Khoảng cách giữa chữ và phong bì */
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    /* Nút phong bì: Xóa sạch khung */
+    #btn-next-message {
+        background: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        cursor: pointer;
+        outline: none;
+        display: inline-flex;
+        transition: transform 0.2s;
+    }
+
+    /* Hiệu ứng rung cho riêng hình ảnh phong bì */
+    .shake-envelope img {
+        animation: envelopeShake 0.5s ease-in-out infinite;
+    }
+
+    @keyframes envelopeShake {
+        0%, 100% { transform: rotate(0); }
+        20% { transform: rotate(-10deg); }
+        40% { transform: rotate(10deg); }
+        60% { transform: rotate(-5deg); }
+        80% { transform: rotate(5deg); }
+    }
+
+    /* Khi nhấn vào vẫn để nó thu nhỏ nhẹ cho sinh động */
+    #btn-next-message:active {
+        transform: scale(0.85);
+    }
+
+    /* Điều chỉnh lại font size tiêu đề khi đi chung với phong bì cho đẹp */
+    .envelope-container h2 {
+        font-size: 26px !important;
+        white-space: nowrap; /* Tránh chữ bị nhảy xuống hàng trên máy tính */
+    }
+
+    /* Tối ưu cho iPhone/Điện thoại: Nếu chữ quá dài thì phong bì tự xuống hàng nhẹ */
+    @media (max-width: 600px) {
         .envelope-container {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
+            flex-wrap: wrap; /* Tự động xuống hàng nếu màn hình quá hẹp */
+        }
+        .envelope-container h2 {
+            font-size: 20px !important;
+        }
+    }
+    /* --- QUÀ TẶNG & BOOM --- */
+    #giftResult {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
+        background: #ee4d2d; /* Màu đỏ cam Shopee */
+        display: none; justify-content: center; align-items: center;
+        z-index: 1000; opacity: 0; transition: opacity 2s;
+    }
+    .gift-box {
+        font-size: 100px; /* Khôi phục độ to chuẩn Hình 5 */
+        cursor: pointer;
+        animation: shake 2s infinite cubic-bezier(.36,.07,.19,.97) both;
+        transform-origin: bottom;
+        position: relative;
+        z-index: 100; /* Đảm bảo nhấn được */
+    }
+
+    /* Xóa bỏ đoạn CSS ép ẩn hộp quà trong Media Query để tránh lỗi ko nhấn được */
+    @media (orientation: portrait) and (max-width: 768px) {
+        #rotate-hint { display: flex; }
+        #gift-content-wrapper { display: none; } /* Chỉ ẩn khi máy đứng */
+    }
+
+    #giftResult.active-show { opacity: 1; }
+
+    #finalImage { width: 100%; height: 100%; object-fit: contain; }
+
+    .btn-back-corner { position: absolute; top: 15px; right: 15px; z-index: 1100; opacity: 0; transition: opacity 1s; }
+
+    /* --- MEDIA QUERIES (LANDSCAPE IPHONE FIX) --- */
+    @media (orientation: landscape) and (max-height: 500px) {
+        #app-container { background: none !important; }
+        
+        #screen-journey { justify-content: center !important; padding: 5px !important; }
+        #screen-journey h2 { font-size: 18px !important; margin-bottom: 2px !important; }
+
+        .film-container { margin-bottom: 5px !important; padding: 5px 0 !important; }
+        .film-card { width: 160px !important; padding: 5px !important; }
+        .film-card img { height: 90px !important; }
+
+        #screen-journey button { 
+            position: relative !important; 
+            margin-top: 5px !important; 
+            padding: 8px 25px !important; 
+            font-size: 12px !important; 
         }
 
-        #btn-next-message {
-            font-size: 40px; /* Tăng kích thước icon lên một chút vì không còn khung */
-            background: none !important; /* Xóa màu nền */
-            border: none !important; /* Xóa viền */
-            box-shadow: none !important; /* Xóa đổ bóng */
-            cursor: pointer;
-            padding: 0;
-            margin: 0;
-            outline: none;
-            -webkit-tap-highlight-color: transparent; /* Xóa vệt xanh khi chạm trên điện thoại */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: transform 0.2s;
-        }
+        .video-wrapper { width: 180px !important; max-width: 180px; }
+        #wishes-container { height: 50vh; }
+    }
 
-        /* Hiệu ứng khi nhấn vào vẫn để nó thu nhỏ nhẹ cho có cảm giác thật */
-        #btn-next-message:active {
-            transform: scale(0.8);
-        }
-
-        /* Cập nhật hiệu ứng rung: Chỉ rung cái phong bì, không đổi màu nền nữa */
-        .shake-envelope {
-            animation: envelopeShake 0.5s ease-in-out infinite;
-        }
-
-        @keyframes envelopeShake {
-            0%, 100% { transform: rotate(0); }
-            20% { transform: rotate(-15deg); }
-            40% { transform: rotate(15deg); }
-            60% { transform: rotate(-10deg); }
-            80% { transform: rotate(10deg); }
-        }
-
-        @keyframes envelopeShake {
-            0%, 100% { transform: rotate(0); }
-            20% { transform: rotate(-10deg); }
-            40% { transform: rotate(10deg); }
-            60% { transform: rotate(-5deg); }
-            80% { transform: rotate(5deg); }
-        }
-
-        /* Ẩn nút nhận quà cho đến khi đọc hết tin */
-        #btn-final-gift {
-            display: none;
-            margin-top: 20px;
-            animation: popUp 0.5s forwards;
-        }
-    </style>
+    /* HIỆU ỨNG CHUNG */
+    @keyframes messageIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes envelopeShake { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-15deg); } 40% { transform: rotate(15deg); } }
+    .shake-envelope { animation: envelopeShake 0.5s ease-in-out infinite; }
+</style>
 </head>
 <body>
 
@@ -1504,8 +1135,27 @@
             "Chị chắc chưa? Tâm huyết dữ lắm ó, bỏ qua là hối hận nhoo! 🥺", 
             "🤨", 
             function() {
-                // Khi nhấn xác nhận skip, hàm goToScreen ở trên sẽ xử lý dọn dẹp video
-                window.triggerSurprise(); 
+                // --- HÀNH ĐỘNG KHI NHẤN XÁC NHẬN "VẪN BỎ QUA" ---
+                const btnAfterVideo = document.getElementById('btnAfterVideo');
+                const loadingOverlay = document.getElementById('video-loading-overlay');
+
+                // 1. Dừng hẳn video và đưa về đầu
+                if(video) {
+                    video.pause();
+                    video.currentTime = 0;
+                }
+
+                // 2. Ẩn cái loading (nếu video chưa kịp tải xong đã nhấn skip)
+                if(loadingOverlay) loadingOverlay.style.display = 'none';
+
+                // 3. HIỆN CÁI NÚT "XEM TIẾP" Ở DƯỚI CLIP
+                if(btnAfterVideo) {
+                    btnAfterVideo.style.display = 'block';
+                    btnAfterVideo.style.animation = 'popUp 0.5s forwards';
+                }
+
+                // Ở lại màn hình này, không nhảy đi đâu cả để chị Linh tự nhấn nút tiếp theo
+                console.log("Đã kích hoạt nút tiếp theo dưới clip!");
             }
         );
     };
