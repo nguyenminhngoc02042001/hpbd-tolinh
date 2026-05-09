@@ -530,8 +530,8 @@
             font-size: 12px !important;
             background: rgba(255, 111, 105, 0.1) !important; /* Màu hồng nhạt trong suốt */
             backdrop-filter: blur(5px);
-            border: 1px solid var(--primary) !important;
-            color: var(--primary) !important;
+            border: 1px solid rgb(255, 111, 105) !important;
+            color: rgb(255, 111, 105) !important;
             border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s;
@@ -585,14 +585,20 @@
             width: 45px;
             height: 45px;
             border-radius: 50%;
-            background: #ffb6b9;
+            /* background: #ffb6b9; <-- Có thể xóa dòng này nếu muốn ảnh hiện nền của nó */
+            overflow: hidden; /* QUAN TRỌNG: Để ảnh không bị tràn ra ngoài vòng tròn */
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 24px; /* Kích thước icon avatar */
             flex-shrink: 0;
             border: 2px solid white;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .chat-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Đảm bảo ảnh luôn đầy khung không bị méo */
         }
 
         .chat-bubble-wrapper {
@@ -883,7 +889,7 @@
     <!-- MÀN HÌNH 3 (Cho LINH): ĐÁM MÂY LỜI CHÚC BAY LÊN -->
     <div id="screen-surprise-linh" class="screen" style="justify-content: flex-start; padding-top: 20px;">
         <div class="envelope-container">
-            <h2 style="font-family: 'Pacifico'; margin-bottom:0;">Tin nhắn chờ nè...</h2>
+            <h2 style="font-family: 'Pacifico'; margin-bottom:0;">Team Content TVS DLibK12 - Vê Đốc...</h2>
             <button id="btn-next-message" onclick="showNextMessage()">
                 <img src="https://cdn-icons-png.flaticon.com/512/3940/3940626.png" style="width: 50px; height: auto;">
             </button>
@@ -1125,7 +1131,26 @@
             // Tạo tin nhắn mới
             let chatItem = document.createElement('div');
             chatItem.className = 'chat-item';
-            const femaleAvatars = ['👧', '👩‍🦰', '👩‍🦳', '👱‍♀️', '👩‍🎨', '👩‍💻'];
+            // Thay đổi danh sách avatar từ Emoji sang đường dẫn ảnh trên GitHub
+            const femaleAvatars = [
+                'images/ava1.png',
+                'images/ava2.png',
+                'images/ava3.png',
+                'images/ava4.png',
+                'images/ava5.png',
+                'images/ava6.png'
+            ];
+
+            // Trong phần .innerHTML của chatItem, hãy sửa thẻ div chứa avatar thành thẻ img
+            chatItem.innerHTML = `
+                <div class="chat-avatar">
+                    <img src="${randomAva}" alt="avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="chat-bubble-wrapper">
+                    <span class="sender-name">${item.sender || "Người thương"}</span>
+                    <div class="chat-bubble">${item.text}</div>
+                </div>
+            `;
             const randomAva = femaleAvatars[currentWishIndex % femaleAvatars.length];
 
             chatItem.innerHTML = `
@@ -1297,7 +1322,7 @@
         document.getElementById('btn-alert-ok').innerText = "Vẫn bỏ qua 😤";
         
         window.customAlert(
-            "Ủa chắc chưa? Clip người ta làm tâm huyết dữ lắm, bỏ qua là hối hận nhóoo! 🥺", 
+            "Chị chắc chưa? Tâm huyết dữ lắm ó, bỏ qua là hối hận nhoo! 🥺", 
             "🤨", 
             function() {
                 // Khi nhấn Vẫn bỏ qua, hàm goToScreen ở trên sẽ xử lý việc dừng hẳn video
