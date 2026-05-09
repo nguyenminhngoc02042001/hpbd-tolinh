@@ -987,34 +987,31 @@
 
     // --- HÀM CHUYỂN MÀN HÌNH ---
     window.goToScreen = function(screenId) {
+        // 1. TÌM CÁC THÀNH PHẦN ÂM THANH
         const video = document.getElementById('birthdayVideo');
-        const bgMusic = document.getElementById('bg-music');
-        
-        // --- 1. XỬ LÝ VIDEO ---
+        const sound = document.getElementById('notif-sound');
+        const bgMusic = document.getElementById('bg-music'); // Nếu bạn có nhạc nền
+
+        // 2. DỪNG VIDEO TUYỆT ĐỐI
         if (video) {
             video.pause(); 
             video.currentTime = 0;
         }
 
-        // --- 2. XỬ LÝ NHẠC NỀN (MIXER LOGIC) ---
-        if (bgMusic) {
-            if (screenId === 'screen-video') {
-                // VÀO MÀN VIDEO: Tắt nhạc nền để nghe tiếng clip
-                bgMusic.pause();
-            } 
-            else if (screenId === 'screen-surprise-linh') {
-                // VÀO MÀN TIN NHẮN: Bật nhạc nhưng nhỏ lại (volume 0.3) để nghe tiếng "Ting"
-                bgMusic.volume = 0.3; 
-                bgMusic.play().catch(() => { console.log("Chờ tương tác để phát nhạc"); });
-            } 
-            else if (screenId === 'screen-journey' || screenId === 'screen-gift' || screenId === 'screen-surprise-guest') {
-                // CÁC MÀN KHÁC: Bật nhạc to rõ (volume 1.0)
-                bgMusic.volume = 1.0;
-                bgMusic.play().catch(() => { console.log("Chờ tương tác để phát nhạc"); });
-            }
+        // 3. DỪNG TIẾNG "TING" TUYỆT ĐỐI
+        if (sound) {
+            sound.pause();
+            sound.currentTime = 0;
         }
 
-        // --- 3. XỬ LÝ CHUYỂN MÀN HÌNH ---
+        // 4. XÓA BỘ ĐẾM GIỜ (QUAN TRỌNG NHẤT)
+        // Lệnh này giúp chặn tiếng "Ting" nổ ra sau khi đã rời màn hình chat
+        if (window.idleTimer) {
+            clearTimeout(window.idleTimer);
+            window.idleTimer = null;
+        }
+
+        // 5. CHUYỂN MÀN HÌNH
         document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
         const target = document.getElementById(screenId);
         if(target) {
@@ -1189,9 +1186,11 @@
 
             // Nếu còn tin nhắn, bắt đầu đếm ngược 8 giây để nhắc nhở
             if (currentWishIndex < allWishes.length) {
-                idleTimer = setTimeout(() => {
+                window.idleTimer = setTimeout(() => {
                     btnNext.classList.add('shake-envelope');
-                    if(sound) sound.play().catch(()=>{}); 
+                    if(sound) {
+                        sound.play().catch(()=>{}); 
+                    }
                 }, 8000); 
             } else {
                 // Đã hết tin nhắn
@@ -1353,16 +1352,19 @@
     // Hàm hỏi trước khi Skip
     window.askSkip = function() {
         const video = document.getElementById('birthdayVideo');
-        if(video) video.pause(); // Tạm dừng để hỏi
+        if(video) video.pause(); // Tạm dừng tiếng clip ngay lập tức
 
-        document.getElementById('btn-alert-cancel').style.display = 'block';
-        document.getElementById('btn-alert-ok').innerText = "Vẫn bỏ qua 😤";
+        const btnCancel = document.getElementById('btn-alert-cancel');
+        const btnOk = document.getElementById('btn-alert-ok');
+        
+        if(btnCancel) btnCancel.style.display = 'block';
+        if(btnOk) btnOk.innerText = "Vẫn bỏ qua 😤";
         
         window.customAlert(
             "Chị chắc chưa? Tâm huyết dữ lắm ó, bỏ qua là hối hận nhoo! 🥺", 
             "🤨", 
             function() {
-                // Khi nhấn Vẫn bỏ qua, hàm goToScreen ở trên sẽ xử lý việc dừng hẳn video
+                // Khi nhấn xác nhận skip, hàm goToScreen ở trên sẽ xử lý dọn dẹp video
                 window.triggerSurprise(); 
             }
         );
