@@ -1128,10 +1128,7 @@
         if (currentWishIndex < allWishes.length) {
             const item = allWishes[currentWishIndex];
             
-            // Tạo tin nhắn mới
-            let chatItem = document.createElement('div');
-            chatItem.className = 'chat-item';
-            // Thay đổi danh sách avatar từ Emoji sang đường dẫn ảnh trên GitHub
+            // 1. Khai báo danh sách ảnh avatar (Đảm bảo file có trong folder images/)
             const femaleAvatars = [
                 'images/ava1.png',
                 'images/ava2.png',
@@ -1141,28 +1138,25 @@
                 'images/ava6.png'
             ];
 
-            // Trong phần .innerHTML của chatItem, hãy sửa thẻ div chứa avatar thành thẻ img
+            // 2. Định nghĩa biến randomAva TRƯỚC khi sử dụng (Fix lỗi ReferenceError)
+            const randomAva = femaleAvatars[currentWishIndex % femaleAvatars.length];
+
+            // 3. Tạo tin nhắn mới với cấu trúc chuẩn Messenger
+            let chatItem = document.createElement('div');
+            chatItem.className = 'chat-item';
             chatItem.innerHTML = `
                 <div class="chat-avatar">
                     <img src="${randomAva}" alt="avatar" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <div class="chat-bubble-wrapper">
-                    <span class="sender-name">${item.sender || "Người thương"}</span>
+                    <span class="sender-name">${item.sender || "Người thương ẩn danh"}</span>
                     <div class="chat-bubble">${item.text}</div>
                 </div>
             `;
-            const randomAva = femaleAvatars[currentWishIndex % femaleAvatars.length];
-
-            chatItem.innerHTML = `
-                <div class="chat-avatar">${randomAva}</div>
-                <div class="chat-bubble-wrapper">
-                    <span class="sender-name">${item.sender || "Người thương"}</span>
-                    <div class="chat-bubble">${item.text}</div>
-                </div>
-            `;
+            
             container.appendChild(chatItem);
             
-            // Cuộn xuống
+            // Cuộn xuống tin nhắn mới nhất
             container.scrollTop = container.scrollHeight;
             
             currentWishIndex++;
@@ -1171,11 +1165,11 @@
             if (currentWishIndex < allWishes.length) {
                 idleTimer = setTimeout(() => {
                     btnNext.classList.add('shake-envelope');
-                    if(sound) sound.play().catch(()=>{}); // Phát âm thanh (trình duyệt có thể chặn nếu chưa tương tác)
-                }, 8000); // 8 giây
+                    if(sound) sound.play().catch(()=>{}); 
+                }, 8000); 
             } else {
                 // Đã hết tin nhắn
-                document.getElementById('msg-count').innerText = "Đã đọc hết tin nhắn! ✨";
+                document.getElementById('msg-count').innerText = "Đã đọc hết tin nhắn rồi nè! ✨";
                 btnNext.style.display = 'none';
                 btnGift.style.display = 'block';
             }
