@@ -132,7 +132,7 @@
             display: flex;
             gap: 20px; 
             width: max-content; 
-            animation: scroll-left 140s linear infinite; /* KÉO THỜI GIAN LÊN 18s DO BĂNG ẢNH ĐÃ DÀI HƠN */
+            animation: scroll-left 100s linear infinite; /* KÉO THỜI GIAN LÊN 18s DO BĂNG ẢNH ĐÃ DÀI HƠN */
             padding-left: 20px; 
         }
 
@@ -1274,14 +1274,6 @@
             console.log("Autoplay bị chặn, đang hiện nút thay thế");
             loading.innerHTML = "<button onclick='this.parentElement.style.display=\"none\"; document.getElementById(\"birthdayVideo\").play();' style='background:#ff6f69'>Bấm để xem clip chị nhé! ▶️</button>";
         });
-
-        // 4. Khi video kết thúc
-        video.onended = function() {
-            btnNext.style.display = 'block';
-            btnNext.style.animation = 'popUp 0.5s forwards';
-            // Thông báo nhẹ nhàng
-            window.customAlert("Điều bất ngờ vẫn còn ở phía sau... Chạm để xem tiếp nhé!", "🎬");
-        };
     };
     // Hàm hỏi trước khi Skip
     window.askSkip = function() {
