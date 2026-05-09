@@ -903,12 +903,12 @@
         <button id="btn-final-gift" onclick="goToScreen('screen-gift')">
             Hết tin nhắn rồi, nhận quà thôi chị đọep 🎁
         </button>
-        
-        <!-- Âm thanh tin nhắn -->
-        <audio id="notif-sound" src="ting.mp3" preload="auto"></audio>
-        <!-- Nhạc nền chính (để chế độ loop để tự động phát lại khi hết) -->
-        <audio id="bg-music" src="bg-music.mp3" loop preload="auto"></audio>
     </div>
+
+    <!-- Âm thanh tin nhắn -->
+    <audio id="notif-sound" src="ting.mp3" preload="auto"></audio>
+    <!-- Nhạc nền chính (để chế độ loop để tự động phát lại khi hết) -->
+    <audio id="bg-music" src="bg-music.mp3" loop preload="auto"></audio>
 
     <!-- MÀN HÌNH 3 (Cho USER KHÁC): FORM GHI THIỆP CHÚC MỪNG -->
     <div id="screen-surprise-guest" class="screen">
@@ -987,31 +987,32 @@
 
     // --- HÀM CHUYỂN MÀN HÌNH ---
     window.goToScreen = function(screenId) {
-        // 1. TÌM CÁC THÀNH PHẦN ÂM THANH
         const video = document.getElementById('birthdayVideo');
         const sound = document.getElementById('notif-sound');
-        const bgMusic = document.getElementById('bg-music'); // Nếu bạn có nhạc nền
+        const bgMusic = document.getElementById('bg-music');
 
-        // 2. DỪNG VIDEO TUYỆT ĐỐI
-        if (video) {
-            video.pause(); 
-            video.currentTime = 0;
+        // 1. Dừng video và tiếng ting
+        if (video) { video.pause(); video.currentTime = 0; }
+        if (sound) { sound.pause(); sound.currentTime = 0; }
+        if (window.idleTimer) { clearTimeout(window.idleTimer); window.idleTimer = null; }
+
+        // 2. ĐIỀU PHỐI NHẠC NỀN
+        if (bgMusic) {
+            if (screenId === 'screen-video') {
+                // Vào xem clip: Tắt nhạc nền
+                bgMusic.pause();
+            } else if (screenId === 'screen-surprise-linh') {
+                // Vào xem tin nhắn: Nhạc nhỏ lại (0.2) để nghe tiếng "Ting"
+                bgMusic.volume = 0.2;
+                bgMusic.play().catch(() => {});
+            } else {
+                // Các màn hình khác: Nhạc to rõ (1.0)
+                bgMusic.volume = 1.0;
+                bgMusic.play().catch(() => {});
+            }
         }
 
-        // 3. DỪNG TIẾNG "TING" TUYỆT ĐỐI
-        if (sound) {
-            sound.pause();
-            sound.currentTime = 0;
-        }
-
-        // 4. XÓA BỘ ĐẾM GIỜ (QUAN TRỌNG NHẤT)
-        // Lệnh này giúp chặn tiếng "Ting" nổ ra sau khi đã rời màn hình chat
-        if (window.idleTimer) {
-            clearTimeout(window.idleTimer);
-            window.idleTimer = null;
-        }
-
-        // 5. CHUYỂN MÀN HÌNH
+        // 3. Chuyển màn hình
         document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
         const target = document.getElementById(screenId);
         if(target) {
