@@ -522,6 +522,153 @@
                 max-width: 400px;
             }
         }
+
+        /* Nút Skip nhỏ xinh nằm góc video */
+        .btn-skip {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 20;
+            padding: 6px 15px !important;
+            font-size: 11px !important;
+            background: rgba(255, 255, 255, 0.3) !important;
+            backdrop-filter: blur(5px);
+            border: 1px solid white !important;
+            color: #fff !important;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 0 !important;
+        }
+
+        /* Style cho nút Hủy trong bảng thông báo */
+        #btn-alert-cancel {
+            background: #ccc !important;
+            margin-top: 10px;
+            width: 100%;
+        }
+        /* --- GIAO DIỆN MESSENGER CHUẨN: TỪNG LỚP, BÊN TRÁI --- */
+        #wishes-container {
+            width: 100%;
+            height: 65vh; /* Chiều cao cố định để cuộn */
+            overflow-y: auto; 
+            padding: 15px;
+            display: flex;
+            flex-direction: column; /* Xếp từ trên xuống dưới */
+            align-items: flex-start; /* Ép tất cả sang bên trái */
+            gap: 20px; /* Khoảng cách giữa các tin nhắn */
+            background: rgba(255, 255, 255, 0.2); /* Nền mờ nhẹ */
+            border-radius: 20px;
+        }
+
+        /* Ẩn thanh cuộn xấu xí */
+        #wishes-container::-webkit-scrollbar { display: none; }
+
+        .chat-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            max-width: 90%; /* Không để tin nhắn quá dài tràn màn hình */
+            opacity: 0;
+            transform: translateX(-20px); /* Hiệu ứng trượt từ trái sang */
+            animation: messageIn 0.5s ease forwards;
+        }
+
+        @keyframes messageIn {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .chat-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #ffb6b9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px; /* Kích thước icon avatar */
+            flex-shrink: 0;
+            border: 2px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .chat-bubble-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sender-name {
+            font-size: 12px;
+            font-weight: bold;
+            color: #ff6f69;
+            margin-bottom: 4px;
+            margin-left: 5px;
+        }
+
+        .chat-bubble {
+            padding: 12px 18px;
+            background: white;
+            color: #444;
+            border-radius: 4px 20px 20px 20px; /* Bo góc kiểu Messenger bên trái */
+            font-size: 14px;
+            line-height: 1.5;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            word-wrap: break-word; /* Tự xuống dòng nếu từ quá dài */
+        }
+        /* Nút phong bì cạnh tiêu đề */
+        .envelope-container {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #btn-next-message {
+            font-size: 40px; /* Tăng kích thước icon lên một chút vì không còn khung */
+            background: none !important; /* Xóa màu nền */
+            border: none !important; /* Xóa viền */
+            box-shadow: none !important; /* Xóa đổ bóng */
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            outline: none;
+            -webkit-tap-highlight-color: transparent; /* Xóa vệt xanh khi chạm trên điện thoại */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        /* Hiệu ứng khi nhấn vào vẫn để nó thu nhỏ nhẹ cho có cảm giác thật */
+        #btn-next-message:active {
+            transform: scale(0.8);
+        }
+
+        /* Cập nhật hiệu ứng rung: Chỉ rung cái phong bì, không đổi màu nền nữa */
+        .shake-envelope {
+            animation: envelopeShake 0.5s ease-in-out infinite;
+        }
+
+        @keyframes envelopeShake {
+            0%, 100% { transform: rotate(0); }
+            20% { transform: rotate(-15deg); }
+            40% { transform: rotate(15deg); }
+            60% { transform: rotate(-10deg); }
+            80% { transform: rotate(10deg); }
+        }
+
+        @keyframes envelopeShake {
+            0%, 100% { transform: rotate(0); }
+            20% { transform: rotate(-10deg); }
+            40% { transform: rotate(10deg); }
+            60% { transform: rotate(-5deg); }
+            80% { transform: rotate(5deg); }
+        }
+
+        /* Ẩn nút nhận quà cho đến khi đọc hết tin */
+        #btn-final-gift {
+            display: none;
+            margin-top: 20px;
+            animation: popUp 0.5s forwards;
+        }
     </style>
 </head>
 <body>
@@ -530,7 +677,7 @@
     
     <!-- MÀN HÌNH 1: ĐĂNG NHẬP -->
     <div id="screen-login" class="screen active">
-        <h1>Welcome to my world🎂</h1>
+        <h1>Welcome to my world 🎂</h1>
         <p style="margin-bottom: 20px; text-align:center;">Vui lòng nhập tên của bạn nhé!</p>
         <input type="text" id="usernameInput" placeholder="Ví dụ: Hồng Linh, Tuấn...">
         <button onclick="handleLogin()">Khám phá ngay</button>
@@ -712,6 +859,8 @@
         <h2 id="video-title" style="font-family: 'Pacifico'; color: #ff6f69; opacity: 0; transition: opacity 1s;">Gửi chị một chút yêu thương... 🎥</h2>
         
         <div class="video-wrapper">
+            <!-- Nút Skip nằm ở đây -->
+            <button class="btn-skip" onclick="askSkip()">Bỏ qua xíu... 🤫</button>
             <!-- playsinline: quan trọng để chạy được trên Safari/iPhone -->
             <video id="birthdayVideo" playsinline>
                 <!-- Vì file video nằm cùng chỗ với index.html, bạn chỉ cần ghi tên file là xong -->
@@ -730,16 +879,25 @@
     </div>
 
     <!-- MÀN HÌNH 3 (Cho LINH): ĐÁM MÂY LỜI CHÚC BAY LÊN -->
-    <div id="screen-surprise-linh" class="screen">
-        <h2 class="z-100">Cơn mưa tình yêu 🌧️💖</h2>
-        <p class="z-100" style="text-align: center; background: rgba(255,255,255,0.7); padding: 5px 15px; border-radius: 20px;">Đọc hết lời chúc nhé!</p>
+    <div id="screen-surprise-linh" class="screen" style="justify-content: flex-start; padding-top: 20px;">
+        <div class="envelope-container">
+            <h2 style="font-family: 'Pacifico'; margin-bottom:0;">Tin nhắn chờ nè...</h2>
+            <button id="btn-next-message" onclick="showNextMessage()">
+                <img src="https://cdn-icons-png.flaticon.com/512/3940/3940626.png" style="width: 50px; height: auto;">
+            </button>
+        </div>
+        <p id="msg-count" style="font-size: 12px; color: #888; margin-top: 5px;">Bấm vào phong bì để đọc tiếp nhé!</p>
+        
         <div id="wishes-container">
-            <!-- Bóng bay sẽ gen ra ở đây qua Javascript -->
+            <!-- Tin nhắn hiện ở đây -->
         </div>
-        <!-- Cố định nút quà ở dưới -->
-        <div class="z-100" style="position: absolute; bottom: 30px; width: 100%; text-align: center;">
-            <button onclick="goToScreen('screen-gift')">Chạm nhẹ cái nữa nè chị đọep 🎁</button>
-        </div>
+
+        <button id="btn-final-gift" onclick="goToScreen('screen-gift')">
+            Hết tin nhắn rồi, nhận quà thôi chị đọep 🎁
+        </button>
+        
+        <!-- Âm thanh tin nhắn -->
+        <audio id="notif-sound" src="ting.mp3" preload="auto"></audio>
     </div>
 
     <!-- MÀN HÌNH 3 (Cho USER KHÁC): FORM GHI THIỆP CHÚC MỪNG -->
@@ -778,12 +936,16 @@
 </div>
 
     <!-- Cấu trúc Custom Alert -->
-    <div id="custom-alert-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 9999; backdrop-filter: blur(4px); justify-content: center; align-items: center;">
-        <div id="custom-alert-box" style="background: white; padding: 30px; border-radius: 20px; width: 85%; max-width: 350px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popUp 0.3s ease-out;">
-            <div id="alert-icon" style="font-size: 40px; margin-bottom: 15px;">✨</div>
-            <p id="alert-message" style="font-size: 16px; color: #555; line-height: 1.5; margin-bottom: 25px; font-weight: 600;"></p>
-            <button onclick="closeCustomAlert()" style="margin-top: 0; width: 100%; background: linear-gradient(45deg, #ffb6b9, #ff8a8f);">Oki nè!</button>
-        </div>
+<div id="custom-alert-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 9999; backdrop-filter: blur(4px); justify-content: center; align-items: center;">
+    <div id="custom-alert-box" style="background: white; padding: 30px; border-radius: 20px; width: 85%; max-width: 350px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+        <div id="alert-icon" style="font-size: 40px; margin-bottom: 15px;">✨</div>
+        <p id="alert-message" style="font-size: 16px; color: #555; line-height: 1.5; margin-bottom: 25px; font-weight: 600;"></p>
+        
+        <!-- THÊM ID="btn-alert-ok" VÀO ĐÂY -->
+        <button id="btn-alert-ok" onclick="closeCustomAlert()" style="margin-top: 0; width: 100%; background: linear-gradient(45deg, #ffb6b9, #ff8a8f);">Oki nè!</button>
+        
+        <!-- Nút Hủy (Mặc định ẩn) -->
+        <button id="btn-alert-cancel" style="display: none; background: #ccc !important; margin-top: 10px; width: 100%;" onclick="cancelCustomAlert()">Thui xem tiếp...</button>
     </div>
 </div>
 
@@ -912,24 +1074,75 @@
 };
 
     // --- LỜI CHÚC BAY LÊN ---
-    function startFloatingWishes() {
-        const container = document.getElementById('wishes-container');
+    let allWishes = [];
+    let currentWishIndex = 0;
+    let idleTimer = null;
+
+    // Hàm bắt đầu màn hình tin nhắn của Linh
+    window.startFloatingWishes = function() {
         onValue(wishesRef, (snapshot) => {
-            container.innerHTML = ''; 
             const data = snapshot.val();
             if (data) {
-                Object.values(data).forEach((item, index) => {
-                    let el = document.createElement('div');
-                    el.className = 'cloud-wish';
-                    el.innerText = item.text;
-                    el.style.left = Math.floor(Math.random() * 70) + 5 + "%";
-                    el.style.animationDelay = (index * 1.5) + "s";
-                    container.appendChild(el);
+                allWishes = Object.values(data);
+                currentWishIndex = 0;
+                document.getElementById('wishes-container').innerHTML = '';
+                
+                // Hiện thông báo đầu tiên
+                window.customAlert(`Chị có ${allWishes.length} tin nhắn chưa đọc từ "người hâm mộ"!`, "📩", function() {
+                    // Sau khi nhấn OK, hiện tin đầu tiên luôn
+                    showNextMessage();
                 });
             }
-        });
-    }
+        }, { onlyOnce: true }); // Chỉ lấy dữ liệu 1 lần lúc vào màn hình
+    };
 
+    window.showNextMessage = function() {
+        const container = document.getElementById('wishes-container');
+        const btnNext = document.getElementById('btn-next-message');
+        const btnGift = document.getElementById('btn-final-gift');
+        const sound = document.getElementById('notif-sound');
+
+        // Dừng hiệu ứng rung và timer cũ
+        btnNext.classList.remove('shake-envelope');
+        clearTimeout(idleTimer);
+
+        if (currentWishIndex < allWishes.length) {
+            const item = allWishes[currentWishIndex];
+            
+            // Tạo tin nhắn mới
+            let chatItem = document.createElement('div');
+            chatItem.className = 'chat-item';
+            const femaleAvatars = ['👧', '👩‍🦰', '👩‍🦳', '👱‍♀️', '👩‍🎨', '👩‍💻'];
+            const randomAva = femaleAvatars[currentWishIndex % femaleAvatars.length];
+
+            chatItem.innerHTML = `
+                <div class="chat-avatar">${randomAva}</div>
+                <div class="chat-bubble-wrapper">
+                    <span class="sender-name">${item.sender || "Người thương"}</span>
+                    <div class="chat-bubble">${item.text}</div>
+                </div>
+            `;
+            container.appendChild(chatItem);
+            
+            // Cuộn xuống
+            container.scrollTop = container.scrollHeight;
+            
+            currentWishIndex++;
+
+            // Nếu còn tin nhắn, bắt đầu đếm ngược 8 giây để nhắc nhở
+            if (currentWishIndex < allWishes.length) {
+                idleTimer = setTimeout(() => {
+                    btnNext.classList.add('shake-envelope');
+                    if(sound) sound.play().catch(()=>{}); // Phát âm thanh (trình duyệt có thể chặn nếu chưa tương tác)
+                }, 8000); // 8 giây
+            } else {
+                // Đã hết tin nhắn
+                document.getElementById('msg-count').innerText = "Đã đọc hết tin nhắn! ✨";
+                btnNext.style.display = 'none';
+                btnGift.style.display = 'block';
+            }
+        }
+    };
     // --- KIỂM TRA XOAY MÀN HÌNH ---
     window.checkRotationRequirement = function() {
         const currentScreen = document.querySelector('.screen.active');
@@ -1069,6 +1282,44 @@
             // Thông báo nhẹ nhàng
             window.customAlert("Điều bất ngờ vẫn còn ở phía sau... Chạm để xem tiếp nhé!", "🎬");
         };
+    };
+    // Hàm hỏi trước khi Skip
+    window.askSkip = function() {
+        // Tạm dừng video khi đang hỏi
+        const video = document.getElementById('birthdayVideo');
+        video.pause();
+
+        // Hiện bảng hỏi với 2 lựa chọn
+        document.getElementById('btn-alert-cancel').style.display = 'block';
+        document.getElementById('btn-alert-ok').innerText = "Vẫn bỏ qua 😤";
+        
+        window.customAlert(
+            "Ủa chắc chưa? Clip người ta làm tâm huyết dữ lắm, bỏ qua là hối hận cả đời nhóoo! 🥺", 
+            "🤨", 
+            function() {
+                // Nếu vẫn chọn "Vẫn bỏ qua" (OK)
+                window.triggerSurprise();
+            }
+        );
+    };
+
+    // Hàm khi người dùng hối hận, muốn xem tiếp (Cancel)
+    window.cancelCustomAlert = function() {
+        document.getElementById('custom-alert-overlay').style.display = 'none';
+        document.getElementById('btn-alert-cancel').style.display = 'none';
+        document.getElementById('btn-alert-ok').innerText = "Oki nè!";
+        
+        // Phát tiếp video
+        const video = document.getElementById('birthdayVideo');
+        video.play();
+    };
+
+    // Sửa lại hàm closeCustomAlert một chút để reset nút
+    const originalClose = window.closeCustomAlert;
+    window.closeCustomAlert = function() {
+        document.getElementById('btn-alert-cancel').style.display = 'none';
+        document.getElementById('btn-alert-ok').innerText = "Oki nè!";
+        originalClose();
     };
 </script>
 </body>
