@@ -525,19 +525,23 @@
 
         /* Nút Skip nhỏ xinh nằm góc video */
         .btn-skip {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            z-index: 20;
-            padding: 6px 15px !important;
-            font-size: 11px !important;
-            background: rgba(255, 255, 255, 0.3) !important;
+            display: inline-block;
+            padding: 6px 18px !important;
+            font-size: 12px !important;
+            background: rgba(255, 111, 105, 0.1) !important; /* Màu hồng nhạt trong suốt */
             backdrop-filter: blur(5px);
-            border: 1px solid white !important;
-            color: #fff !important;
+            border: 1px solid var(--primary) !important;
+            color: var(--primary) !important;
             border-radius: 20px;
             cursor: pointer;
-            margin-top: 0 !important;
+            transition: all 0.3s;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .btn-skip:hover {
+            background: var(--primary) !important;
+            color: white !important;
         }
 
         /* Style cho nút Hủy trong bảng thông báo */
@@ -856,16 +860,14 @@
 
     <!-- MÀN HÌNH CLIP KỶ NIỆM (MỚI) -->
     <div id="screen-video" class="screen">
-        <h2 id="video-title" style="font-family: 'Pacifico'; color: #ff6f69; opacity: 0; transition: opacity 1s;">Gửi chị một chút yêu thương... 🎥</h2>
+        <h2 id="video-title" style="font-family: 'Pacifico'; color: #ff6f69; margin-bottom: 5px;">Gửi chị một chút yêu thương... 🎥</h2>
         
+        <!-- CHUYỂN NÚT SKIP RA NGOÀI VÀ NẰM Ở ĐÂY -->
+        <button class="btn-skip" onclick="askSkip()" style="margin-bottom: 15px; position: static !important; opacity: 0.8;">Bỏ qua xíu... 🤫</button>
+
         <div class="video-wrapper">
-            <!-- Nút Skip nằm ở đây -->
-            <button class="btn-skip" onclick="askSkip()">Bỏ qua xíu... 🤫</button>
-            <!-- playsinline: quan trọng để chạy được trên Safari/iPhone -->
-            <video id="birthdayVideo" playsinline>
-                <!-- Vì file video nằm cùng chỗ với index.html, bạn chỉ cần ghi tên file là xong -->
+            <video id="birthdayVideo" playsinline webkit-playsinline>
                 <source src="clip.mp4" type="video/mp4">
-                Trình duyệt của bạn không hỗ trợ video.
             </video>
             
             <!-- Overlay dự phòng nếu mạng quá chậm hoặc trình duyệt chặn -->
