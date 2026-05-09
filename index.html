@@ -625,11 +625,16 @@
             padding: 12px 18px;
             background: white;
             color: #444;
-            border-radius: 4px 20px 20px 20px; /* Bo góc kiểu Messenger bên trái */
+            border-radius: 4px 20px 20px 20px;
             font-size: 14px;
             line-height: 1.5;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            word-wrap: break-word; /* Tự xuống dòng nếu từ quá dài */
+            
+            /* DÒNG QUAN TRỌNG NHẤT ĐÂY NÈ */
+            white-space: pre-wrap;  
+            
+            /* Giúp ngắt từ nếu người dùng cố tình gõ 1 từ quá dài */
+            word-break: break-word; 
         }
         /* Nút phong bì cạnh tiêu đề */
         .envelope-container {
@@ -1145,27 +1150,21 @@
         const btnGift = document.getElementById('btn-final-gift');
         const sound = document.getElementById('notif-sound');
 
-        // --- 1. DỌN DẸP TIN NHẮN CŨ ---
-        // Hủy ngay bộ đếm giờ nhắc nhở của tin nhắn trước đó (nếu user bấm sớm)
         if (window.idleTimer) {
             clearTimeout(window.idleTimer);
             window.idleTimer = null;
         }
-        // Dừng hiệu ứng rung phong bì
         btnNext.classList.remove('shake-envelope');
 
-        // --- 2. XỬ LÝ HIỆN TIN NHẮN MỚI ---
         if (currentWishIndex < allWishes.length) {
             const item = allWishes[currentWishIndex];
             
-            // PHÁT TIẾNG "TING" NGAY LẬP TỨC (Âm thanh báo có tin nhắn mới tới)
             if (sound) {
                 sound.pause();
-                sound.currentTime = 0; // Reset về đầu để phát lại ngay
+                sound.currentTime = 0;
                 sound.play().catch(() => {}); 
             }
 
-            // Tạo giao diện tin nhắn (Giữ nguyên phần avatar bạn đã làm)
             const femaleAvatars = [
                 'images/ava1.png', 'images/ava2.png', 'images/ava3.png', 
                 'images/ava4.png', 'images/ava5.png', 'images/ava6.png',
@@ -1174,6 +1173,10 @@
             ];
             const randomAva = femaleAvatars[currentWishIndex % femaleAvatars.length];
 
+            // --- BƯỚC 1: XỬ LÝ CHỮ \n TRƯỚC (NẰM NGOÀI HTML) ---
+            const textWithNewLines = item.text.split('\\n').join('\n'); 
+
+            // --- BƯỚC 2: TẠO THẺ DIV VÀ GÁN NỘI DUNG (CHỈ GÁN 1 LẦN) ---
             let chatItem = document.createElement('div');
             chatItem.className = 'chat-item';
             chatItem.innerHTML = `
@@ -1182,7 +1185,7 @@
                 </div>
                 <div class="chat-bubble-wrapper">
                     <span class="sender-name">${item.sender || "Người thương ẩn danh"}</span>
-                    <div class="chat-bubble">${item.text}</div>
+                    <div class="chat-bubble">${textWithNewLines}</div>
                 </div>
             `;
             
@@ -1191,9 +1194,7 @@
             
             currentWishIndex++;
 
-            // --- 3. THIẾT LẬP NHẮC NHỞ CHO TIN TIẾP THEO ---
             if (currentWishIndex < allWishes.length) {
-                // Sau 8 giây nếu chưa bấm tin tiếp theo, phong bì sẽ rung và kêu "Ting" nhắc nhở
                 window.idleTimer = setTimeout(() => {
                     btnNext.classList.add('shake-envelope');
                     if (sound) {
@@ -1202,13 +1203,13 @@
                     }
                 }, 8000); 
             } else {
-                // Nếu là tin nhắn cuối cùng
                 document.getElementById('msg-count').innerText = "Đã đọc hết tin nhắn rồi nè! ✨";
                 btnNext.style.display = 'none';
                 btnGift.style.display = 'block';
             }
         }
     };
+
     // --- KIỂM TRA XOAY MÀN HÌNH ---
     window.checkRotationRequirement = function() {
         const currentScreen = document.querySelector('.screen.active');
