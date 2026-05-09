@@ -237,6 +237,16 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 20px;
+        /* Ẩn thanh cuộn cho Chrome, Safari và các trình duyệt dùng Webkit */
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Ẩn thanh cuộn cho Firefox */
+        scrollbar-width: none;
+
+        /* Ẩn thanh cuộn cho IE và Edge cũ */
+        -ms-overflow-style: none;
     }
 
     .chat-item { display: flex; align-items: flex-start; gap: 10px; max-width: 90%; animation: messageIn 0.5s ease forwards; }
@@ -805,20 +815,23 @@
             elem.msRequestFullscreen();
         }
         let name = document.getElementById('usernameInput').value.trim();
-        if(!name) { window.customAlert('Nhập tên bạn ơi ^^', '🌸'); return; }
-        
-        window.currentUser = name; 
-        let normalizedName = name.toLowerCase();
+            if(!name) { window.customAlert('Nhập tên bạn ơi ^^', '🌸'); return; }
+            
+            window.currentUser = name; 
+            let normalizedName = name.toLowerCase();
 
-        if(normalizedName.includes('linh')) {
-            window.isMainLinh = true; // Xác nhận là Linh
-            window.goToScreen('screen-welcome-linh');
-        } else {
-            window.isMainLinh = false; // Xác nhận là Khách
-            document.getElementById('guestWelcomeTitle').innerText = `Hế nhô ${name}! 🥳`;
-            window.goToScreen('screen-welcome-guest');
-        }
-    };
+            // LUÔN ĐẶT LÀ FALSE TRƯỚC
+            window.isMainLinh = false; 
+
+            // KIỂM TRA CHÍNH XÁC: Chỉ những tên có chữ "linh" mới là chủ tiệc
+            if(normalizedName.includes('linh')) {
+                window.isMainLinh = true;
+                window.goToScreen('screen-welcome-linh');
+            } else {
+                document.getElementById('guestWelcomeTitle').innerText = `Hế nhô ${name}! 🥳`;
+                window.goToScreen('screen-welcome-guest');
+            }
+        };
 
     // --- HÀM BẤT NGỜ (FIX LỖI NHẢY SAI MÀN HÌNH) ---
     window.triggerSurprise = function() {
@@ -845,42 +858,37 @@
 
     // --- GỬI LỜI CHÚC ---
     window.submitWish = function() {
-    let btn = event.target; // Lấy cái nút vừa nhấn
-    let content = document.getElementById('wishInput').value.trim();
-    
-    if(!content) { 
-        window.customAlert('Nhập xíu tâm tình cho chủ tiệc vui nha ^^!', '✍️'); 
-        return; 
-    }
+        let content = document.getElementById('wishInput').value.trim();
+        if(!content) { 
+            window.customAlert('Nhập xíu tâm tình cho chủ tiệc vui nha ^^!', '✍️'); 
+            return; 
+        }
 
-    // 1. Trạng thái chờ: Đổi màu nút và chặn nhấn liên tục
-    btn.disabled = true;
-    btn.innerHTML = "Đang gửi đi... ⏳";
-    btn.style.opacity = "0.7";
-
-    // 2. Gửi lên Firebase
-    push(wishesRef, { 
-        sender: window.currentUser, 
-        text: content, 
-        timestamp: Date.now() 
-    })
-    .then(() => {
-        // 3. Thành công
-        window.customAlert("Thiệp đã trao tận tay chị Tờ Linh rồi nhó!", '🚀', function() {
-            window.goToScreen('screen-gift');
-        });
-    })
-    .catch((error) => {
-        // 4. Xử lý nếu có lỗi mạng
-        console.error("Lỗi Firebase:", error);
-        window.customAlert("Mạng hơi yếu, mình bấm gửi lại nhé!", "❌");
+        // Gửi lên Firebase (Sử dụng ID thay vì event.target)
+        const btn = document.querySelector('#screen-surprise-guest button');
+        if(btn) {
+            btn.disabled = true;
+            btn.innerHTML = "Đang gửi đi... ⏳";
+        }
         
-        // Trả lại trạng thái nút ban đầu để người dùng nhấn lại
-        btn.disabled = false;
-        btn.innerHTML = "Gửi thiệp đi nè 🚀";
-        btn.style.opacity = "1";
-    });
-};
+        push(wishesRef, { 
+            sender: window.currentUser, 
+            text: content, 
+            timestamp: Date.now() 
+        })
+        .then(() => {
+            window.customAlert("Thiệp đã trao tận tay chị Tờ Linh rồi nhó!", '🚀', function() {
+                window.goToScreen('screen-gift');
+            });
+        })
+        .catch((error) => {
+            window.customAlert("Mạng hơi yếu, bấm gửi lại thử nhé!", "❌");
+            if(btn) {
+                btn.disabled = false;
+                btn.innerHTML = "Gửi thiệp đi nè 🚀";
+            }
+        });
+    };
 
     // --- LỜI CHÚC BAY LÊN ---
     let allWishes = [];
