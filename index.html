@@ -1302,18 +1302,35 @@
         const btnNext = document.getElementById('btnAfterVideo');
 
         // 2. Hiện tiêu đề từ từ
-        setTimeout(() => { title.style.opacity = '1'; }, 500);
+        setTimeout(() => { if(title) title.style.opacity = '1'; }, 500);
 
-        // 3. Lệnh phát video (được kích hoạt bởi nút bấm vừa rồi nên sẽ có tiếng)
+        // 3. Phát video
         video.play().then(() => {
-            // Nếu phát thành công, ẩn cái loading đi
-            loading.style.display = 'none';
+            if(loading) loading.style.display = 'none';
         }).catch(error => {
-            // Trường hợp trình duyệt vẫn chặn (rất hiếm khi đã nhấn nút)
-            console.log("Autoplay bị chặn, đang hiện nút thay thế");
-            loading.innerHTML = "<button onclick='this.parentElement.style.display=\"none\"; document.getElementById(\"birthdayVideo\").play();' style='background:#ff6f69'>Bấm để xem clip chị nhé! ▶️</button>";
+            if(loading) loading.innerHTML = "<button onclick='this.parentElement.style.display=\"none\"; document.getElementById(\"birthdayVideo\").play();' style='background:#ff6f69'>Bấm để xem clip chị nhé! ▶️</button>";
         });
+
+        // 4. KHI VIDEO KẾT THÚC (PHẦN QUAN TRỌNG NHẤT)
+        video.onended = function() {
+            // Hiện nút dự phòng (để lỡ khách không bấm OK trên alert vẫn có chỗ bấm)
+            if(btnNext) {
+                btnNext.style.display = 'block';
+                btnNext.style.animation = 'popUp 0.5s forwards';
+            }
+
+            // Hiện thông báo, khi nhấn "Oki nè!" sẽ tự động gọi hàm triggerSurprise
+            window.customAlert(
+                "Hết clip rồi, xem điều bất ngờ tiếp theo chị nhé! ✨", 
+                "🎬", 
+                function() {
+                    // ĐÂY LÀ LỆNH TỰ ĐỘNG CHUYỂN MÀN HÌNH
+                    window.triggerSurprise();
+                }
+            );
+        };
     };
+
     // Hàm hỏi trước khi Skip
     window.askSkip = function() {
         const video = document.getElementById('birthdayVideo');
